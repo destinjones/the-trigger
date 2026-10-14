@@ -12,7 +12,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 import type { Http } from './_types.ts';
 
-const UA = 'the-trigger/0.1 (+https://github.com/cwbhood/the-trigger)';
+const UA = 'the-trigger/0.1 (+https://github.com/destinjones/the-trigger)';
 
 export interface CassetteEntry {
   key: string;

@@ -11,7 +11,7 @@ import ledgerJson from '../../../predictions/ledger.json';
 
 export type { Snapshot };
 
-export const REPO_URL = (import.meta.env.REPO_URL as string | undefined) ?? 'https://github.com/cwbhood/the-trigger';
+export const REPO_URL = (import.meta.env.REPO_URL as string | undefined) ?? 'https://github.com/destinjones/the-trigger';
 export const weights = parseWeights(weightsText);
 
 const files = import.meta.glob<Snapshot>('../../../data/*.json', { eager: true, import: 'default' });

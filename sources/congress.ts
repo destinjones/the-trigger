@@ -95,7 +95,7 @@ export const congress: RichSource = {
     const live = bills.filter((b) => b.status !== 'expired');
     const moved = live.filter((b) => b.moved);
     const cosponsors = live.reduce((a, b) => a + b.cosponsors, 0);
-    const listUrl = 'https://github.com/cwbhood/the-trigger/blob/main/sources/watchlist.yaml';
+    const listUrl = 'https://github.com/destinjones/the-trigger/blob/main/sources/watchlist.yaml';
     const top = [...live].sort((a, b) => b.cosponsors - a.cosponsors)[0];
     const asOf = live.map((b) => b.date).sort().at(-1) ?? ctx.today;
 

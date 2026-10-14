@@ -207,7 +207,7 @@ export const edgar: RichSource = {
     return (await this.fetchRich(ctx)).metrics;
   },
   async fetchRich(ctx: FetchContext): Promise<SourceOutput> {
-    const ua = ctx.env.SEC_USER_AGENT || 'the-trigger research bot (github.com/cwbhood/the-trigger)';
+    const ua = ctx.env.SEC_USER_AGENT || 'the-trigger research bot (github.com/destinjones/the-trigger)';
     const headers = { 'user-agent': ua };
     const rows: FilingRecord[] = [];
     const errors: string[] = [];
