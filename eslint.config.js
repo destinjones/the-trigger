@@ -13,6 +13,10 @@ export default tseslint.config(
     },
   },
   {
+    files: ['**/*.mjs'],
+    languageOptions: { globals: { process: 'readonly' } },
+  },
+  {
     files: ['index/**/*.ts'],
     rules: {
       'no-restricted-properties': [

@@ -1,0 +1,200 @@
+---
+import Base from '../layouts/Base.astro';
+import Clock from '../components/Clock.tsx';
+import Gauge from '../components/Gauge.tsx';
+import SubIndex from '../components/SubIndex.tsx';
+import MetricCard from '../components/MetricCard.tsx';
+import BillRow from '../components/BillRow.tsx';
+import WhoMoving from '../components/WhoMoving.tsx';
+import SourceCite from '../components/SourceCite.tsx';
+import Sparkline from '../components/Sparkline.tsx';
+import { fileUrl, latest, ledger, metric, previous, series, snapshotUrl, weights } from '../lib/data.ts';
+import { fmtNumber } from '../lib/format.ts';
+import { normalize } from '../../../index/normalize.ts';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const method = (hash = '') => `${base}/method${hash}`;
+const snapUrl = snapshotUrl(latest);
+
+const subKeys = Object.keys(weights.subIndices);
+const metricsFor = (key: string | null) =>
+  latest.metrics.filter((m) => (key === null ? weights.metrics[m.metricId] === null : weights.metrics[m.metricId] === key));
+
+const gap = (s: typeof latest) => {
+  const d = s.subIndices.labor_dislocation;
+  const p = s.subIndices.political_momentum;
+  return d === null || p === null || d === undefined || p === undefined ? null : d - p;
+};
+const gapNow = gap(latest);
+const gapSeries = series(gap);
+
+const filings = latest.filings ?? [];
+const edgarMetric = metric(latest, 'corporate.capex_headcount_gap_pp');
+const openPredictions = ledger.predictions.filter((p) => p.status === 'open');
+---
+<Base
+  title="The Trigger: AI dividend readiness tracker"
+  description={`Readiness ${latest.readiness}/100. Projected first federal AI dividend ${latest.projectedDate} ±${latest.bandMonths} months, ${Math.round(latest.confidence * 100)}% confidence. Every number cited.`}
+  page="index"
+>
+  <div class="hero">
+    <div class="panel">
+      <Clock
+        client:load
+        target={latest.projectedDate}
+        confidence={latest.confidence}
+        bandMonths={latest.bandMonths}
+        readiness={latest.readiness}
+        asOf={latest.date}
+        citeHref={snapUrl}
+        methodHref={method('#projection')}
+      />
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <h2>Composite readiness</h2>
+        <SourceCite href={snapUrl} name={`weights ${latest.weightsVersion}`} />
+      </div>
+      <Gauge value={latest.readiness} />
+      <div class="panel-head" style="margin-top:8px">
+        <span class="small muted">trend, all snapshots</span>
+        <Sparkline points={series((s) => s.readiness)} width={140} color="var(--amber)" />
+      </div>
+      <p class="thesis">
+        Checks do not arrive from goodwill. They arrive when consumer spending breaks: AI cuts
+        white-collar payroll, displaced workers stop spending, everyone else bleeds, politicians panic.
+      </p>
+    </div>
+  </div>
+
+  <section>
+    <div class="grid subindices">
+      {subKeys.map((k) => (
+        <div class="panel">
+          <SubIndex
+            label={weights.subIndices[k]?.label ?? k}
+            value={latest.subIndices[k] ?? null}
+            weight={weights.subIndices[k]?.weight ?? 0}
+            metricCount={metricsFor(k).length}
+            citeHref={snapUrl}
+            methodHref={method(`#${k}`)}
+          />
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>The gap: dislocation minus political response</h2>
+      <SourceCite href={snapUrl} name="snapshot sub-indices" />
+    </div>
+    <div class="metric-row">
+      <span class="metric-value num">{gapNow === null ? 'no data' : `${gapNow >= 0 ? '+' : '−'}${Math.abs(gapNow).toFixed(1)}`}</span>
+      <span class="small muted">
+        labor dislocation {latest.subIndices.labor_dislocation?.toFixed(1) ?? '—'} vs political momentum {latest.subIndices.political_momentum?.toFixed(1) ?? '—'}.
+        Positive means pain is outrunning the response; that is when the thesis says the response gets forced.
+      </span>
+      <Sparkline points={gapSeries} width={140} color="var(--violet)" />
+    </div>
+  </section>
+
+  {subKeys.map((k) => metricsFor(k).length > 0 && (
+    <section>
+      <div class="group-title"><b>{weights.subIndices[k]?.label}</b><span>{metricsFor(k).length} inputs</span></div>
+      <div class="grid metrics">
+        {metricsFor(k).map((m) => (
+          <MetricCard metric={m} prior={metric(previous, m.metricId)} score={normalize(m.metricId, m.value)} history={series((s) => metric(s, m.metricId)?.value)} />
+        ))}
+      </div>
+    </section>
+  ))}
+
+  <section>
+    <div class="panel">
+      <div class="panel-head"><h2>Federal bills</h2><a class="small" href={fileUrl('sources/watchlist.yaml')}>watchlist</a></div>
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr><th>Latest</th><th>Bill</th><th>Co-sp.</th><th>Status</th><th>Source</th></tr></thead>
+          <tbody>{latest.bills.map((b) => <BillRow bill={b} />)}</tbody>
+        </table>
+      </div>
+    </div>
+    <div class="panel" style="margin-top:12px">
+      <div class="panel-head"><h2>Who's moving</h2><a class="small" href={fileUrl('sources/curated/actors.yaml')}>roster</a></div>
+      <div class="table-wrap"><WhoMoving actors={latest.actors} /></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Spent on compute, cut from payroll (SEC 10-K)</h2>
+      {edgarMetric && <SourceCite href={edgarMetric.sourceUrl} name={edgarMetric.sourceName} asOf={edgarMetric.asOf} stale={edgarMetric.stale} />}
+    </div>
+    {filings.length === 0 ? (
+      <p class="small muted">
+        No filings parsed in this snapshot{latest.sourceErrors.edgar ? ` (EDGAR: ${latest.sourceErrors.edgar.slice(0, 160)})` : ''}.
+        The daily job reads capex from XBRL and headcount from each company's last two 10-Ks.
+      </p>
+    ) : (
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr><th>Company</th><th>FY end</th><th>Capex</th><th>Capex YoY</th><th>Headcount</th><th>Headcount YoY</th><th>Source</th></tr></thead>
+          <tbody>
+            {filings.map((f) => (
+              <tr>
+                <td>{f.company} <span class="muted">{f.ticker}</span></td>
+                <td class="num">{f.periodEnd}</td>
+                <td class="num">{fmtNumber(f.capexUsd, 'USD')}</td>
+                <td class="num">{f.capexYoyPct === null ? '—' : `${f.capexYoyPct >= 0 ? '+' : '−'}${Math.abs(f.capexYoyPct).toFixed(1)}%`}</td>
+                <td class="num">{f.headcount === null ? '—' : f.headcount.toLocaleString('en-US')}</td>
+                <td class={`num ${f.headcountYoyPct !== null && f.headcountYoyPct < 0 ? 'red' : ''}`}>{f.headcountYoyPct === null ? '—' : `${f.headcountYoyPct >= 0 ? '+' : '−'}${Math.abs(f.headcountYoyPct).toFixed(1)}%`}</td>
+                <td><SourceCite href={f.sourceUrl} name="10-K" /></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )}
+  </section>
+
+  {metricsFor(null).length > 0 && (
+    <section>
+      <div class="group-title"><b>Calibration, unscored</b><span>recorded to check our projection against, never added to the index</span></div>
+      <div class="grid metrics">
+        {metricsFor(null).map((m) => (
+          <MetricCard metric={m} prior={metric(previous, m.metricId)} score={null} history={series((s) => metric(s, m.metricId)?.value)} />
+        ))}
+      </div>
+    </section>
+  )}
+
+  <section class="two-col">
+    <div class="panel">
+      <div class="panel-head"><h2>Open predictions</h2><SourceCite href={fileUrl('predictions/ledger.json')} name="ledger" /></div>
+      <table class="table">
+        <thead><tr><th>Made</th><th>Claim</th><th>Conf.</th></tr></thead>
+        <tbody>
+          {openPredictions.map((p) => (
+            <tr><td class="num nowrap">{p.madeOn}</td><td>{p.claim}</td><td class="num">{Math.round(p.confidence * 100)}%</td></tr>
+          ))}
+        </tbody>
+      </table>
+      <p class="small muted" style="margin-top:8px">Every projection is logged and graded. <a href={fileUrl('SCOREBOARD.md')}>Scoreboard</a>.</p>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h2>Source status, this snapshot</h2><SourceCite href={snapUrl} name={`${latest.date} r${latest.revision}`} /></div>
+      <div class="status">
+        {latest.sourcesOk.map((s) => <span class="ok">● {s}</span>)}
+        {latest.sourcesFailed.map((s) => <span class="bad" title={latest.sourceErrors[s]}>● {s} failed</span>)}
+        {(latest.sourcesSkipped ?? []).map((s) => <span title="API key not configured">○ {s} skipped</span>)}
+      </div>
+      <p class="small muted" style="margin-top:12px">
+        Coverage <span class="num">{latest.sourceCoveragePct}%</span> of sources live,
+        <span class="num"> {Math.round(latest.weightCovered * 100)}%</span> of index weight fed.
+        Failed sources reuse their last known value, marked stale.
+        {latest.sourcesFailed.length > 0 && <> Hover a failed source for the error.</>}
+      </p>
+    </div>
+  </section>
+</Base>

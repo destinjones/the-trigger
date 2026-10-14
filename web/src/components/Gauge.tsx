@@ -21,7 +21,7 @@ export function arcPath(pct: number): string {
 }
 
 export default function Gauge({ value, label = 'Readiness' }: GaugeProps) {
-  const ticks = [0, 25, 50, 75, 100];
+  const ticks = [25, 50, 75];
   return (
     <svg class="gauge" viewBox="0 0 200 112" role="img" aria-label={`${label} ${value} of 100`}>
       <path d={arcPath(100)} fill="none" stroke="var(--border)" stroke-width="14" />

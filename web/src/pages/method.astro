@@ -1,0 +1,143 @@
+---
+import Base from '../layouts/Base.astro';
+import { TRANSFORMS } from '../../../index/normalize.ts';
+import { PROJECTION, project } from '../../../index/model.ts';
+import { REPO_URL, fileUrl, latest, weights } from '../lib/data.ts';
+
+const subKeys = Object.keys(weights.subIndices);
+const metricsOf = (k: string) => Object.entries(weights.metrics).filter(([, s]) => s === k).map(([id]) => id);
+const unscored = Object.entries(weights.metrics).filter(([, s]) => s === null).map(([id]) => id);
+const anchor = (t: (typeof TRANSFORMS)[string]) =>
+  t.kind === 'linear' ? `${t.at0} → ${t.at100}` : `log, 0 → ${t.at100.toExponential(0)}`;
+const fixture = project(34, 88, '2026-10-14');
+---
+<Base title="Method: The Trigger" description="How the readiness index, normalization and projection are computed, and where they are weak." page="method">
+  <article class="prose">
+    <h1 style="margin-top:24px;font-size:20px">Method</h1>
+    <p class="muted">
+      Everything on the tracker is computed by pure functions from committed data. This page is generated from the
+      same code and weights file that produce the score, so it cannot drift from what the site shows.
+      Current snapshot: <a href={fileUrl(`data/${latest.date}.json`)}>{latest.date}</a>, weights <code>{weights.version}</code>.
+    </p>
+
+    <h2>Pipeline</h2>
+    <ol>
+      <li>A GitHub Action runs once a day. Each source module fetches its upstream records and returns raw values, each with a deep link to the record it came from.</li>
+      <li>Values are normalized to 0–100, where higher always means closer to a dividend being paid.</li>
+      <li>Normalized metrics are averaged into six sub-indices, which are weighted into one composite.</li>
+      <li>The composite drives the projection. The whole result is committed as <code>data/YYYY-MM-DD.json</code>. Git history is the time series; past files are never rewritten. Corrections land as a new commit with a higher <code>revision</code>.</li>
+      <li>The site is a static build of those files. No number is fetched in your browser.</li>
+    </ol>
+
+    <h2 id="weights">Weighting</h2>
+    <p>
+      The weights are an editorial judgment, kept in <a href={fileUrl('index/weights.v1.yaml')}>index/weights.v1.yaml</a> with a
+      comment on each line. The model contains no weights of its own. To argue with them, copy the file to a new version,
+      change it, run <code>pnpm snapshot</code>, and open a pull request with the score your weights produce.
+    </p>
+    <table class="table">
+      <thead><tr><th>Sub-index</th><th>Weight</th><th>Now</th><th>Inputs (equal weight within)</th></tr></thead>
+      <tbody>
+        {subKeys.map((k) => (
+          <tr id={k}>
+            <td>{weights.subIndices[k]?.label}</td>
+            <td class="num">{weights.subIndices[k]?.weight.toFixed(2)}</td>
+            <td class="num">{latest.subIndices[k]?.toFixed(1) ?? 'no data'}</td>
+            <td class="small"><code>{metricsOf(k).join(', ')}</code></td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+    <p class="small muted" style="margin-top:8px">
+      Composite = Σ weight × sub-index. A sub-index is the mean of its normalized metrics. If a sub-index has no data in a
+      run, it is dropped and the remaining weights are rescaled to sum to 1; the snapshot records the share of weight
+      that was fed (<code>weightCovered</code>, now {Math.round(latest.weightCovered * 100)}%).
+    </p>
+
+    <h2 id="normalization">Normalization</h2>
+    <p>
+      Every raw value is mapped to 0–100 with a linear transform clamped at two anchors: the value that means
+      "nothing is happening" (0) and the value that means "the trigger has been pulled" (100). Dollar and recipient
+      totals use a log scale, because the first $100M of precedent matters far more than the next. Anchors live in
+      <a href={fileUrl('index/normalize.ts')}>index/normalize.ts</a>, each with its reasoning.
+    </p>
+    <table class="table">
+      <thead><tr><th>Metric</th><th>Anchors (0 → 100)</th><th>Unit</th><th>Why</th></tr></thead>
+      <tbody>
+        {Object.entries(TRANSFORMS).map(([id, t]) => (
+          <tr>
+            <td class="small"><code>{id}</code></td>
+            <td class="num nowrap">{anchor(t)}</td>
+            <td class="small nowrap">{t.unit}</td>
+            <td class="small">{t.note}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+    <p class="small muted" style="margin-top:8px">
+      Unscored, recorded for calibration only: <code>{unscored.join(', ')}</code>. Prediction markets and GovTrack's
+      prognosis are models of their own; we compare against them rather than stack them into ours.
+    </p>
+
+    <h2 id="projection">Projection</h2>
+    <pre>{`projectedYear = ${PROJECTION.anchorYear} − (readiness / 100) × ${PROJECTION.spanYears}    clamp [${PROJECTION.minYear}, ${PROJECTION.maxYear}]
+confidence    = clamp(0.5 × readiness + 0.5 × sourceCoverage%, ${PROJECTION.confidenceMin}, ${PROJECTION.confidenceMax})
+bandMonths    = (100 − readiness) / 100 × ${PROJECTION.maxBandMonths}`}</pre>
+    <p>
+      A readiness of 0 projects to the second quarter of {Math.floor(PROJECTION.anchorYear)}; a readiness of 100 projects
+      to the floor. The projection never lands before the snapshot it belongs to. Confidence blends how far along the
+      index is with how many sources answered today, and is capped at {PROJECTION.confidenceMax}% because no index of this kind
+      deserves more. The band widens as readiness falls. The site never shows the date without the band.
+    </p>
+    <p>
+      Regression fixture, enforced by the test suite: readiness 34 with 88% of sources live gives
+      <span class="num">{fixture.projectedDate}</span> (Q3 2030), <span class="num">{Math.round(fixture.confidence * 100)}%</span> confidence,
+      ±<span class="num">{fixture.bandMonths}</span> months. Today: readiness <span class="num">{latest.readiness}</span>,
+      coverage <span class="num">{latest.sourceCoveragePct}%</span> → <span class="num">{latest.projectedDate}</span>,
+      <span class="num">{Math.round(latest.confidence * 100)}%</span>, ±<span class="num">{latest.bandMonths}</span> months.
+    </p>
+
+    <h2 id="sources">Sources and failure handling</h2>
+    <p>
+      Tier 1 (BLS, Congress.gov, GovTrack, FRED, Federal Register) are federal or open APIs. Tier 2 and 3 include SEC
+      EDGAR, LegiScan, prediction markets, and hand-curated files for publishers with no API (Challenger layoff reports,
+      national polls, pilot program records). Curated files live in <a href={`${REPO_URL}/tree/main/sources/curated`}>sources/curated/</a>,
+      every value with a deep link, and a curated file is treated as a failed source if no one has re-reviewed it
+      within its stated window.
+    </p>
+    <p>
+      When a source fails, its last known values are carried into the new snapshot marked <code>stale</code> (dashed
+      card on the tracker), the failure is listed in <code>sourcesFailed</code> with its error, and confidence drops through
+      the coverage term. A source that needs an API key nobody configured is skipped, and does not count against coverage.
+      Terms for each source are in <a href={fileUrl('DATA_LICENSE.md')}>DATA_LICENSE.md</a>.
+    </p>
+
+    <h2 id="predictions">Grading ourselves</h2>
+    <p>
+      Every projection is recorded in <a href={fileUrl('predictions/ledger.json')}>predictions/ledger.json</a> with the date it
+      was made and its confidence, and is later resolved as a hit or a miss. <a href={fileUrl('SCOREBOARD.md')}>SCOREBOARD.md</a> is
+      regenerated from the ledger on every run, including our Brier score once anything resolves. Entries are append-only.
+    </p>
+
+    <h2 id="weaknesses">Known weaknesses</h2>
+    <p>We would rather you read this list than discover it.</p>
+    <ul>
+      <li><b>The projection is a line, not a model.</b> It maps one number to one date with constants we chose. It has no causal structure, no fitted parameters, and no backtest, because no country has paid an AI dividend to fit against. Treat the date as a summary of the index, not a forecast with error bars from data.</li>
+      <li><b>The weights and anchors are opinions.</b> Every one is defensible and none is derived. Small changes move the date by years. That is why they live in a file you can fork.</li>
+      <li><b>Confidence is not a probability.</b> It is a formula over readiness and data coverage, clamped to 35–80%. It has not been calibrated against outcomes, and the scoreboard will take years to say anything.</li>
+      <li><b>Entry-level postings are proxied.</b> No free federal series isolates entry-level white-collar hiring, so v1 uses JOLTS openings in professional and business services, which includes senior roles and non-AI-exposed work.</li>
+      <li><b>AI-attributed layoffs depend on what employers say.</b> Challenger counts cuts where the employer cited AI. Companies have reasons to over- or under-claim AI. The trailing-12-month figure is our arithmetic across Challenger's monthly reports, not a figure Challenger publishes.</li>
+      <li><b>Executive action is counted bluntly.</b> The Federal Register metric counts presidential documents whose text mentions artificial intelligence. Some are about AI; some mention it in passing. It measures attention, not direction.</li>
+      <li><b>Bill tracking depends on a watchlist.</b> Congress.gov has no reliable full-text bill search in its API, so we follow a curated list. A relevant bill we have not listed is invisible until someone adds it.</li>
+      <li><b>Some precedent figures are unverified.</b> Cumulative guaranteed-income dollars and recipients are maintainer figures; the pilot dashboard does not publish a total we could confirm. They are flagged in the data and on the card.</li>
+      <li><b>Polling is thin and dated.</b> National UBI polls are rare, question wording varies widely, and the latest one in the file comes from a right-leaning sponsor. One poll drives the whole public opinion sub-index.</li>
+      <li><b>Headcount comes from prose.</b> 10-Ks rarely tag employee counts in XBRL, so EDGAR headcount is parsed from the Human Capital paragraph. A reworded sentence can drop a company from the comparison, and headcount is global while the thesis is about US payroll.</li>
+      <li><b>Fiscal pressure cuts both ways.</b> High deficits can block new spending as easily as force it. We score deficits as pressure toward change; you may reasonably flip the sign.</li>
+      <li><b>Renormalizing over missing sub-indices hides gaps.</b> If a whole sub-index goes dark, the composite leans on what remains. <code>weightCovered</code> exposes this, but the headline number does not.</li>
+      <li><b>Mixed cadences.</b> Inputs update daily, monthly and annually (the deficit is a fiscal-year figure). A daily snapshot is mostly yesterday's numbers.</li>
+    </ul>
+
+    <h2>Out of scope for v0.1</h2>
+    <p class="muted">Accounts, a database, a public API, i18n, mobile apps, alerts and a state-level map. See the roadmap in the README.</p>
+  </article>
+</Base>

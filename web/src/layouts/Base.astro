@@ -1,0 +1,53 @@
+---
+import '../styles/global.css';
+import { REPO_URL, latest } from '../lib/data.ts';
+
+interface Props {
+  title: string;
+  description: string;
+  page: 'index' | 'method';
+}
+const { title, description, page } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <link rel="icon" href={`${base}/favicon.svg`} type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="wrap">
+        <a class="brand" href={`${base}/`}>THE TRIGGER<span>_</span></a>
+        <span class="muted mono">snapshot {latest.date} r{latest.revision}</span>
+        <nav>
+          <a href={`${base}/`} aria-current={page === 'index' ? 'page' : undefined}>Tracker</a>
+          <a href={`${base}/method`} aria-current={page === 'method' ? 'page' : undefined}>Method</a>
+          <a href={REPO_URL}>Source</a>
+        </nav>
+      </div>
+    </header>
+    <main class="wrap">
+      <slot />
+    </main>
+    <footer class="site">
+      <div class="wrap">
+        <a href={`${base}/method`}>Method and known weaknesses (required reading)</a>
+        <a href={`${REPO_URL}/blob/main/index/weights.v1.yaml`}>Fork the weights</a>
+        <a href={`${REPO_URL}/blob/main/SCOREBOARD.md`}>Our prediction record</a>
+        <a href={`${REPO_URL}/blob/main/DATA_LICENSE.md`}>Data sources and terms</a>
+        <a href={`${REPO_URL}/commits/main/data`}>Every snapshot (git history)</a>
+        <span>Not financial or policy advice. Code MIT.</span>
+      </div>
+    </footer>
+  </body>
+</html>
