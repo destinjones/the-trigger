@@ -1,0 +1,62 @@
+name: snapshot
+
+# Pull every source once a day and commit data/YYYY-MM-DD.json.
+# Git history is the time series: this job only ever adds files or new revisions.
+on:
+  schedule:
+    # 14:15 UTC = 10:15 ET, after BLS 8:30 ET releases and Federal Register publication.
+    - cron: '15 14 * * *'
+  workflow_dispatch:
+    inputs:
+      date:
+        description: 'Snapshot date (YYYY-MM-DD). Blank = today (UTC).'
+        required: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: snapshot
+  cancel-in-progress: false
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test
+
+      - name: Pull sources
+        env:
+          CONGRESS_API_KEY: ${{ secrets.CONGRESS_API_KEY }}
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          BLS_API_KEY: ${{ secrets.BLS_API_KEY }}
+          LEGISCAN_API_KEY: ${{ secrets.LEGISCAN_API_KEY }}
+          SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
+        run: |
+          DATE="${{ github.event.inputs.date }}"
+          pnpm snapshot ${DATE:+--date "$DATE"}
+
+      - name: Resolve predictions and regenerate SCOREBOARD.md
+        run: pnpm scorecard
+
+      - name: Commit
+        run: |
+          git config user.name "the-trigger-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/ predictions/ SCOREBOARD.md
+          if git diff --cached --quiet; then
+            echo "No changes."
+            exit 0
+          fi
+          D=$(ls data/ | grep -E '^[0-9]{4}-[0-9]{2}-[0-9]{2}\.json$' | sort | tail -1 | cut -d. -f1)
+          R=$(node -p "require('./data/$D.json').readiness")
+          git commit -m "snapshot $D: readiness $R"
+          git push

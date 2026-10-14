@@ -1,0 +1,20 @@
+# Challenger, Gray & Christmas monthly job-cut reports: cuts where the
+# employer cited artificial intelligence. Challenger publishes no API, so a
+# maintainer updates this file when each report lands (first week of the month).
+# The runner marks this source failed if the newest record is older than maxAgeDays.
+reviewedOn: 2026-10-14
+maxAgeDays: 75
+metrics:
+  - metricId: labor.ai_layoffs_ttm
+    label: AI-attributed job cuts, trailing 12 mo
+    value: 157597
+    unit: jobs
+    asOf: 2026-09-30
+    sourceName: Challenger, Gray & Christmas, Sept 2026 report
+    sourceUrl: https://www.challengergray.com/blog/job-cuts-fall-in-september-hiring-plans-up-3-over-2025-on-weak-early-seasonal-hiring/
+    verified: true
+    # Derived: 2026 YTD through Sept (120,136) + 2025 full year (54,836)
+    #          − 2025 Jan–Sep (48,414 YTD Oct − 31,039 Oct = 17,375).
+    # 2025 full year: https://www.challengergray.com/blog/2025-year-end-challenger-report-highest-q4-layoffs-since-2008-lowest-ytd-hiring-since-2010/
+    # 2025 Oct:       https://www.challengergray.com/blog/october-challenger-report-153074-job-cuts-on-cost-cutting-ai/
+    note: "Derived: 120,136 cut YTD 2026 (21% of all cuts) plus Oct–Dec 2025"

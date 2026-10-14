@@ -1,0 +1,58 @@
+# Guaranteed-income precedent in the US.
+# `programs` counts toward precedent.permanent_programs only when permanent: true
+# (written into a standing budget or statute, not a time-limited pilot).
+reviewedOn: 2026-10-14
+maxAgeDays: 365
+programs:
+  - name: Alaska Permanent Fund Dividend
+    jurisdiction: Alaska
+    permanent: true
+    since: 1982
+    detail: "$1,200 in 2026 ($1,000 dividend + $200 energy relief) to nearly 600,000 residents"
+    asOf: 2026-09-18
+    sourceUrl: https://dor.alaska.gov/department-of-revenue/news-detail/2026/09/28/department-of-revenue-announces-2026-permanent-fund-dividend-amount
+    sourceName: Alaska Department of Revenue
+  - name: Cook County Promise Guaranteed Income
+    jurisdiction: Cook County, IL
+    permanent: true
+    since: 2025
+    detail: "$7.5M in the FY2026 budget; first permanent county program. Pilot paid $500/mo to 3,250 households"
+    asOf: 2025-11-20
+    sourceUrl: https://economicsecurityproject.org/news/cook-county-becomes-first-government-body-in-nation-to-make-guaranteed-income-permanent/
+    sourceName: Economic Security Project
+  - name: Denver Basic Income Project
+    jurisdiction: Denver, CO
+    permanent: false
+    since: 2022
+    detail: "820 unhoused participants, up to $12,000/yr; over $8.9M paid. City declined further funding"
+    asOf: 2026-05-05
+    sourceUrl: https://www.denverbasicincomeproject.org/research
+    sourceName: Denver Basic Income Project
+  - name: NYC Council youth guaranteed income
+    jurisdiction: New York, NY
+    permanent: false
+    since: 2025
+    detail: "$1.5M in the FY2026 council budget for 60 young people; may be one-year"
+    asOf: 2025-12-22
+    sourceUrl: https://council.nyc.gov/press/2025/12/22/3037/
+    sourceName: New York City Council
+
+metrics:
+  - metricId: precedent.cash_disbursed_usd
+    label: Guaranteed-income cash disbursed, cumulative
+    value: 335000000
+    unit: USD
+    asOf: 2026-10-14
+    sourceName: Guaranteed Income Pilots Dashboard
+    sourceUrl: https://guaranteedincome.us/
+    verified: false
+    note: "Maintainer figure. Dashboard lists 32 pilots but publishes no total we could confirm"
+  - metricId: precedent.recipients
+    label: Guaranteed-income recipients, cumulative
+    value: 30000
+    unit: people
+    asOf: 2026-10-14
+    sourceName: Guaranteed Income Pilots Dashboard
+    sourceUrl: https://guaranteedincome.us/
+    verified: false
+    note: "Maintainer figure, not independently confirmed. Excludes Alaska PFD"

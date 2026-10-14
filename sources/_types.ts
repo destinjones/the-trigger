@@ -44,6 +44,8 @@ export interface Source {
   id: string;
   tier: 1 | 2 | 3;
   cadence: 'daily' | 'weekly' | 'monthly';
+  /** Env var the source cannot run without. If unset, the source is skipped, not failed. */
+  requiresEnv?: string;
   fetch(ctx: FetchContext): Promise<SourceResult[]>;
 }
 
@@ -73,6 +75,8 @@ export interface FilingRecord {
   company: string;
   ticker: string;
   fiscalYear: number;
+  /** Fiscal year end date of the latest annual report. */
+  periodEnd: string;
   capexUsd: number;
   capexYoyPct: number | null;
   headcount: number | null;

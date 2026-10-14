@@ -1,0 +1,15 @@
+# National polls on a federal basic income. The index uses the most recent
+# poll (by field end date). Add every new national poll you can cite; older
+# ones stay for the record.
+reviewedOn: 2026-10-14
+maxAgeDays: 365
+metrics:
+  - metricId: opinion.ubi_support_pct
+    label: Support for a universal basic income
+    value: 32
+    unit: "%"
+    asOf: 2026-07-06
+    sourceName: Manhattan Institute national survey, n=1,121
+    sourceUrl: https://manhattan.institute/article/american-attitudes-on-welfare-waste-crime-and-the-political-environment
+    verified: true
+    note: "32% support, 50% oppose a monthly payment to every adult. Fielded Jul 1–6, 2026; right-leaning sponsor"

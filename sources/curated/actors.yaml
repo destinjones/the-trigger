@@ -1,0 +1,54 @@
+# "Who's moving": actors with a live vehicle that would move the US toward
+# (or away from) a citizen dividend. signal: toward | away | neutral
+reviewedOn: 2026-10-14
+maxAgeDays: 120
+actors:
+  - actor: Sen. Bernie Sanders
+    vehicle: S. 4825 American A.I. Sovereign Wealth Fund Act
+    status: Referred to Senate Finance, Jun 18 2026
+    signal: toward
+    asOf: 2026-06-18
+    sourceUrl: https://www.congress.gov/bill/119th-congress/senate-bill/4825
+    sourceName: Congress.gov
+  - actor: Rep. Bonnie Watson Coleman
+    vehicle: H.R. 5830 Guaranteed Income Pilot Program Act ($495M)
+    status: Referred to Ways and Means, 11 co-sponsors
+    signal: toward
+    asOf: 2025-10-24
+    sourceUrl: https://www.congress.gov/bill/119th-congress/house-bill/5830
+    sourceName: Congress.gov
+  - actor: Sam Altman / OpenAI
+    vehicle: 5% of OpenAI equity to a US sovereign wealth fund
+    status: Proposed, not binding
+    signal: toward
+    asOf: 2026-07-02
+    sourceUrl: https://techcrunch.com/2026/07/02/openai-proposed-donating-5-of-its-equity-to-a-us-sovereign-wealth-fund/
+    sourceName: TechCrunch / FT
+  - actor: White House
+    vehicle: Federal equity stake in OpenAI
+    status: Talks reported
+    signal: toward
+    asOf: 2026-06-05
+    sourceUrl: https://www.cnbc.com/2026/06/05/trump-open-ai-altman-stake.html
+    sourceName: CNBC
+  - actor: Cook County, IL
+    vehicle: Permanent guaranteed income in FY2026 budget
+    status: Enacted
+    signal: toward
+    asOf: 2025-11-20
+    sourceUrl: https://economicsecurityproject.org/news/cook-county-becomes-first-government-body-in-nation-to-make-guaranteed-income-permanent/
+    sourceName: Economic Security Project
+  - actor: City of Denver
+    vehicle: Denver Basic Income Project
+    status: City declined further funding
+    signal: away
+    asOf: 2026-05-05
+    sourceUrl: https://www.denverbasicincomeproject.org/research
+    sourceName: Denver Basic Income Project
+  - actor: State of Alaska
+    vehicle: Permanent Fund Dividend 2026
+    status: "$1,200 paid from Oct 1 to ~600,000 residents"
+    signal: neutral
+    asOf: 2026-09-18
+    sourceUrl: https://dor.alaska.gov/department-of-revenue/news-detail/2026/09/28/department-of-revenue-announces-2026-permanent-fund-dividend-amount
+    sourceName: Alaska Department of Revenue

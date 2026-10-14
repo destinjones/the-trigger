@@ -14,6 +14,8 @@ export interface Snapshot extends SnapshotCore {
   filings: FilingRecord[];
   /** Why each failed source failed, for the run log and the UI. */
   sourceErrors: Record<string, string>;
+  /** Sources not attempted because a required key was not configured. */
+  sourcesSkipped: string[];
 }
 
 export interface RunResult {
@@ -23,6 +25,7 @@ export interface RunResult {
   filings: FilingRecord[];
   ok: string[];
   failed: string[];
+  skipped: string[];
   errors: Record<string, string>;
 }
 
@@ -52,9 +55,14 @@ export async function runSources(
   previous: Snapshot | null,
   log: (msg: string) => void = () => {},
 ): Promise<RunResult> {
-  const out: RunResult = { metrics: [], bills: [], actors: [], filings: [], ok: [], failed: [], errors: {} };
+  const out: RunResult = { metrics: [], bills: [], actors: [], filings: [], ok: [], failed: [], skipped: [], errors: {} };
 
   for (const s of sources) {
+    if (s.requiresEnv && !ctx.env[s.requiresEnv]) {
+      out.skipped.push(s.id);
+      log(`skip   ${s.id.padEnd(18)} ${s.requiresEnv} not set`);
+      continue;
+    }
     try {
       const res = isRich(s)
         ? await withTimeout(s.fetchRich(ctx), TIMEOUT_MS, s.id)
@@ -99,5 +107,6 @@ export function assemble(date: string, revision: number, weights: Weights, run: 
     actors: run.actors,
     filings: [...run.filings].sort((a, b) => a.company.localeCompare(b.company)),
     sourceErrors: run.errors,
+    sourcesSkipped: [...run.skipped].sort(),
   };
 }

@@ -1,0 +1,15 @@
+# Corporate equity toward a public fund. Only binding, dated commitments count
+# toward corporate.equity_commitments_usd. Proposals go in `actors`.
+reviewedOn: 2026-10-14
+maxAgeDays: 120
+commitments: []   # none binding as of reviewedOn
+metrics:
+  - metricId: corporate.equity_commitments_usd
+    label: Binding AI equity committed to a public fund
+    value: 0
+    unit: USD
+    asOf: 2026-10-14
+    sourceName: TechCrunch, OpenAI 5% proposal (not binding)
+    sourceUrl: https://techcrunch.com/2026/07/02/openai-proposed-donating-5-of-its-equity-to-a-us-sovereign-wealth-fund/
+    verified: true
+    note: "$0 binding. Largest live proposal: 5% of OpenAI equity to a US sovereign wealth fund"

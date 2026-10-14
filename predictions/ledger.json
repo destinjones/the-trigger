@@ -1,0 +1,17 @@
+{
+  "$comment": "Every projection we make, recorded when made and resolved later. Append-only: never edit a prediction's claim, date or confidence after it is made. Resolve by setting status to hit or miss with evidenceUrl. SCOREBOARD.md is generated from this file by `pnpm scorecard`.",
+  "predictions": [
+    {
+      "id": "p-2026-10-14-first-federal-dividend",
+      "madeOn": "2026-10-14",
+      "claim": "First federal AI dividend payment lands before 2033-01-01",
+      "resolvesBy": "2033-01-01",
+      "confidence": 0.61,
+      "status": "open",
+      "resolvedOn": null,
+      "evidenceUrl": null,
+      "weightsVersion": "v1",
+      "kind": "manual"
+    }
+  ]
+}

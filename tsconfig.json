@@ -17,6 +17,6 @@
     "jsxImportSource": "preact",
     "types": ["node"]
   },
-  "include": ["index", "sources", "scripts", "web/src"],
+  "include": ["index", "sources", "scripts"],
   "exclude": ["node_modules", "web/dist", "web/.astro"]
 }
