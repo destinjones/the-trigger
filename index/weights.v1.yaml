@@ -1,0 +1,71 @@
+# v1 — editorial weighting. Fork it and argue with us.
+#
+# This file is the entire opinion of the index. The model in index/model.ts
+# reads it and does arithmetic; it contains no weights of its own.
+#
+# To propose a different score:
+#   1. copy this file to weights.v2.yaml (never edit a published version),
+#   2. change the numbers and say why in the comments,
+#   3. run `pnpm test` and `pnpm snapshot -- --weights v2`, and open a PR.
+#
+# Rules the loader enforces:
+#   - sub-index weights must sum to 1.0 (±0.001)
+#   - every metric listed below must have a transform in index/normalize.ts
+#   - a metric mapped to `null` is recorded and rendered but does not score
+
+version: v1
+
+subIndices:
+  labor_dislocation:
+    weight: 0.25  # unemployment, payrolls trend, entry-level postings, AI-attributed layoffs
+    label: Labor dislocation
+    # The trigger itself. If white-collar payroll is not breaking, nothing else matters.
+  political_momentum:
+    weight: 0.20  # active bills, co-sponsors, committee movement, floor votes, EOs
+    label: Political momentum
+    # The response. Bills that move, not bills that are filed.
+  precedent:
+    weight: 0.15  # enacted pilots, permanence, total $ disbursed, recipients
+    label: Precedent
+    # Every federal program borrows its design from something smaller that already ran.
+  fiscal_pressure:
+    weight: 0.15  # deficit, receipts, debt service
+    label: Fiscal pressure
+    # Cuts both ways. High deficits make new spending harder and falling receipts
+    # (payroll tax) make the status quo unaffordable. We score it as pressure toward change.
+  public_opinion:
+    weight: 0.15  # polling series
+    label: Public opinion
+  corporate_equity:
+    weight: 0.10  # SWF proposals, equity pledges, AI capex vs headcount
+    label: Corporate equity
+    # Who pays. An equity-funded dividend needs the equity to be on the table first.
+
+# metricId -> sub-index. Equal weight inside each sub-index.
+metrics:
+  labor.unemployment_rate: labor_dislocation
+  labor.payrolls_3mo_avg_change: labor_dislocation
+  labor.white_collar_openings_yoy: labor_dislocation   # proxy for entry-level white-collar postings
+  labor.ai_layoffs_ttm: labor_dislocation
+
+  politics.bills_with_committee_movement: political_momentum
+  politics.cosponsors_total: political_momentum
+  politics.ai_executive_actions_12mo: political_momentum
+
+  precedent.permanent_programs: precedent
+  precedent.cash_disbursed_usd: precedent
+  precedent.recipients: precedent
+
+  fiscal.deficit_pct_gdp: fiscal_pressure
+  fiscal.interest_pct_receipts: fiscal_pressure
+
+  opinion.ubi_support_pct: public_opinion
+
+  corporate.equity_commitments_usd: corporate_equity
+  corporate.capex_headcount_gap_pp: corporate_equity
+
+  # Recorded for calibration against our own projection; deliberately unscored
+  # so the crowd cannot launder itself into the index.
+  markets.passage_probability: null
+  politics.govtrack_prognosis_max: null
+  politics.state_bills_active: null
