@@ -9,6 +9,7 @@ export default tseslint.config(
     rules: {
       // The model must stay deterministic: no wall-clock reads in index/.
       'no-restricted-syntax': 'off',
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_', destructuredArrayIgnorePattern: '^_' }],
     },
   },
   {

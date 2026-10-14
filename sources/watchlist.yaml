@@ -1,0 +1,18 @@
+# Federal bills the tracker follows. Add a bill here and open a PR.
+#
+# A bill belongs on this list if enacting it would put recurring or one-time
+# federal cash in households' hands, or would create the equity vehicle that
+# funds such payments. Pilot programs count; tax credits do not (v1).
+#
+# congress: 119 = 2025–2026. type: hr | s | hjres | sjres
+bills:
+  - congress: 119
+    type: hr
+    number: 5830
+    short: Guaranteed Income Pilot Program Act
+    summary: $495M federal guaranteed-income pilot, administered through Treasury.
+  - congress: 119
+    type: s
+    number: 4825
+    short: American A.I. Sovereign Wealth Fund Act
+    summary: One-time 50% equity tax paid in stock by AI firms over $200M revenue, seeding a fund that pays every American a dividend.

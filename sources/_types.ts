@@ -26,6 +26,8 @@ export interface SourceResult {
   stale?: boolean;
   /** Free-form note shown under the number (method, caveat). */
   note?: string;
+  /** Id of the Source that produced this value. Set by the snapshot runner. */
+  sourceId?: string;
 }
 
 export interface FetchContext {

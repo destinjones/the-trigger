@@ -1,0 +1,163 @@
+{
+  "date": "2026-10-14",
+  "revision": 0,
+  "weightsVersion": "v1",
+  "readiness": 25.8,
+  "projectedDate": "2031-03-09",
+  "confidence": 0.53,
+  "bandMonths": 22,
+  "sourceCoveragePct": 80,
+  "weightCovered": 0.6,
+  "subIndices": {
+    "labor_dislocation": 14.6,
+    "political_momentum": 28.3,
+    "precedent": null,
+    "fiscal_pressure": 41,
+    "public_opinion": null,
+    "corporate_equity": null
+  },
+  "metrics": [
+    {
+      "metricId": "fiscal.deficit_pct_gdp",
+      "label": "Federal deficit, % of GDP",
+      "value": 5.77,
+      "unit": "% of GDP",
+      "asOf": "2025-01-01",
+      "fetchedAt": "2026-10-14T00:00:00Z",
+      "sourceName": "FRED FYFSGDA188S (OMB via St. Louis Fed)",
+      "sourceUrl": "https://fred.stlouisfed.org/series/FYFSGDA188S",
+      "note": "Fiscal year 2025",
+      "sourceId": "fred"
+    },
+    {
+      "metricId": "fiscal.interest_pct_receipts",
+      "label": "Interest outlays, % of receipts",
+      "value": 18.5,
+      "unit": "% of receipts",
+      "asOf": "2025-09-30",
+      "fetchedAt": "2026-10-14T00:00:00Z",
+      "sourceName": "FRED FYOINT / FYFR (OMB via St. Louis Fed)",
+      "sourceUrl": "https://fred.stlouisfed.org/series/FYOINT",
+      "note": "Fiscal year 2025: $970B interest on $5236B receipts",
+      "sourceId": "fred"
+    },
+    {
+      "metricId": "labor.payrolls_3mo_avg_change",
+      "label": "Payroll growth, 3-mo avg",
+      "value": 50.7,
+      "unit": "thousand jobs/mo",
+      "asOf": "2026-09-01",
+      "fetchedAt": "2026-10-14T00:00:00Z",
+      "sourceName": "BLS CES, series CES0000000001",
+      "sourceUrl": "https://data.bls.gov/timeseries/CES0000000001",
+      "note": "Latest month +29k (preliminary)",
+      "sourceId": "bls"
+    },
+    {
+      "metricId": "labor.unemployment_rate",
+      "label": "Unemployment rate",
+      "value": 4.2,
+      "unit": "%",
+      "asOf": "2026-09-01",
+      "fetchedAt": "2026-10-14T00:00:00Z",
+      "sourceName": "BLS CPS, series LNS14000000",
+      "sourceUrl": "https://data.bls.gov/timeseries/LNS14000000",
+      "note": "+0.1 pt vs prior month",
+      "sourceId": "bls"
+    },
+    {
+      "metricId": "labor.white_collar_openings_yoy",
+      "label": "Prof. & business services openings, YoY",
+      "value": 8.3,
+      "unit": "% YoY",
+      "asOf": "2026-08-01",
+      "fetchedAt": "2026-10-14T00:00:00Z",
+      "sourceName": "BLS JOLTS, series JTS540099000000000JOL",
+      "sourceUrl": "https://data.bls.gov/timeseries/JTS540099000000000JOL",
+      "note": "Proxy for entry-level white-collar postings",
+      "sourceId": "bls"
+    },
+    {
+      "metricId": "politics.ai_executive_actions_12mo",
+      "label": "Presidential documents citing AI, 12 mo",
+      "value": 16,
+      "unit": "documents",
+      "asOf": "2026-10-02",
+      "fetchedAt": "2026-10-14T00:00:00Z",
+      "sourceName": "Federal Register API",
+      "sourceUrl": "https://www.federalregister.gov/documents/search?conditions%5Bterm%5D=%22artificial+intelligence%22&conditions%5Btype%5D%5B%5D=PRESDOCU&conditions%5Bpublication_date%5D%5Bgte%5D=2025-10-14",
+      "note": "Latest: Inaugurating the Era of Super Intelligence",
+      "sourceId": "federal-register"
+    },
+    {
+      "metricId": "politics.bills_with_committee_movement",
+      "label": "Bills with committee movement",
+      "value": 0,
+      "unit": "bills",
+      "asOf": "2026-06-18",
+      "fetchedAt": "2026-10-14T00:00:00Z",
+      "sourceName": "Congress.gov actions, 2 watched bills",
+      "sourceUrl": "https://www.congress.gov/bill/119th-congress/house-bill/5830",
+      "note": "0 of 2 watched bills past referral",
+      "sourceId": "congress"
+    },
+    {
+      "metricId": "politics.cosponsors_total",
+      "label": "Co-sponsors, watched bills",
+      "value": 11,
+      "unit": "co-sponsors",
+      "asOf": "2026-06-18",
+      "fetchedAt": "2026-10-14T00:00:00Z",
+      "sourceName": "Congress.gov bill records",
+      "sourceUrl": "https://www.congress.gov/bill/119th-congress/house-bill/5830/cosponsors",
+      "note": "H.R. 5830: 11, S. 4825: 0",
+      "sourceId": "congress"
+    }
+  ],
+  "sourcesOk": [
+    "bls",
+    "congress",
+    "federal-register",
+    "fred"
+  ],
+  "sourcesFailed": [
+    "govtrack"
+  ],
+  "bills": [
+    {
+      "id": "s4825-119",
+      "title": "S. 4825 American A.I. Sovereign Wealth Fund Act",
+      "date": "2026-06-18",
+      "status": "in committee",
+      "cosponsors": 0,
+      "latestAction": "Read twice and referred to the Committee on Finance.",
+      "sourceUrl": "https://www.congress.gov/bill/119th-congress/senate-bill/4825",
+      "sourceName": "Congress.gov"
+    },
+    {
+      "id": "hr5830-119",
+      "title": "H.R. 5830 Guaranteed Income Pilot Program Act",
+      "date": "2025-10-24",
+      "status": "in committee",
+      "cosponsors": 11,
+      "latestAction": "Referred to the House Committee on Ways and Means.",
+      "sourceUrl": "https://www.congress.gov/bill/119th-congress/house-bill/5830",
+      "sourceName": "Congress.gov"
+    }
+  ],
+  "actors": [
+    {
+      "actor": "Executive branch",
+      "vehicle": "Inaugurating the Era of Super Intelligence",
+      "status": "Published 2026-10-02",
+      "signal": "neutral",
+      "asOf": "2026-10-02",
+      "sourceUrl": "https://www.federalregister.gov/documents/2026/10/02/2026-20321/inaugurating-the-era-of-super-intelligence",
+      "sourceName": "Federal Register 2026-20321"
+    }
+  ],
+  "filings": [],
+  "sourceErrors": {
+    "govtrack": "HTTP 502 for https://www.govtrack.us/api/v2/bill?congress=119&bill_type=house_bill&number=5830: <html><head><title>502 Bad Gateway</title></head><body><center><h1>502 Bad Gateway</h1></center><hr><center>nginx/1.14.0 (Ubuntu)</center></body></html>"
+  }
+}
