@@ -80,6 +80,27 @@ section { margin: 12px 0; }
 .groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
 .groups .group-title { margin-top: 4px; }
 
+/* Calculator */
+.calc-inputs { display: flex; flex-wrap: wrap; gap: 12px 32px; margin-bottom: 16px; }
+.stepper { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+.stepper-label { color: var(--muted); min-width: 64px; }
+.stepper button { width: 32px; height: 32px; background: var(--bg); color: var(--fg); border: 1px solid var(--border); font: 500 16px/1 var(--mono); cursor: pointer; }
+.stepper button:disabled { color: var(--muted); cursor: default; }
+.stepper-value { font-size: 20px; min-width: 24px; text-align: center; }
+.calc-month { font-size: 20px; color: var(--amber); white-space: nowrap; }
+.calc-table td:nth-child(3) { white-space: nowrap; }
+
+/* Log */
+.log-entry { margin: 12px 0; }
+.log-summary { font-size: 15px; margin: 0 0 8px; }
+.log-changes { margin: 0; padding-left: 18px; font-size: 13px; }
+.log-changes li { margin-bottom: 4px; }
+.log-changes .log-source { color: var(--red); }
+
+/* Embed */
+.embed { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.embed code { word-break: break-all; }
+
 /* Hero */
 .hero { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 12px; margin-top: 12px; }
 .clock-label { font-size: 12px; color: var(--muted); }
@@ -172,6 +193,15 @@ footer.site .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; }
 @media (max-width: 560px) {
   .topbar .snap { display: none; }
   .brand { white-space: nowrap; }
+  .topbar .wrap { height: auto; flex-wrap: wrap; padding-top: 8px; padding-bottom: 8px; gap: 6px 16px; }
+  .topbar nav { margin-left: 0; flex-wrap: wrap; gap: 4px 14px; }
+  .calc-table thead { display: none; }
+  .calc-table tr { display: grid; grid-template-columns: auto auto 1fr; gap: 4px 16px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .calc-table td { border: 0; padding: 0; }
+  .calc-table td:first-child { grid-column: 1 / -1; }
+  .calc-month::after { content: '/mo'; font-size: 12px; color: var(--muted); }
+  .calc-year::after { content: '/yr'; font-size: 11px; color: var(--muted); }
+  .calc-table td:last-child { justify-self: end; min-width: 0; overflow: hidden; }
 }
 
 @media (max-width: 860px) {

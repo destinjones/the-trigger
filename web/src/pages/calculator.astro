@@ -1,0 +1,77 @@
+---
+import Base from '../layouts/Base.astro';
+import Calculator, { type CalcPlan } from '../components/Calculator.tsx';
+import SourceCite from '../components/SourceCite.tsx';
+import { parse } from 'yaml';
+import payoutsText from '../../../sources/curated/payouts.yaml?raw';
+import { fundNeeded, householdPerYear, perPersonPerYear, type Plan, type Population } from '../../../index/payouts.ts';
+import { fileUrl, latest } from '../lib/data.ts';
+import { fmtNumber } from '../lib/format.ts';
+import { quarter } from '../lib/headline.ts';
+
+interface PayoutsFile {
+  reviewedOn: string | Date;
+  population: Population & { asOf: string | Date; sourceName: string; sourceUrl: string; note: string };
+  plans: (Plan & { status: string; basis: string; sourceName: string; sourceUrl: string })[];
+}
+const file = parse(payoutsText) as PayoutsFile;
+const pop = file.population;
+const plans: CalcPlan[] = file.plans.map(({ status, basis, sourceName, sourceUrl, ...plan }) => ({
+  plan: plan as Plan, status, basis, sourceName, sourceUrl,
+}));
+const lead = file.plans.find((p) => p.id === 's4825') ?? file.plans[0];
+if (!lead) throw new Error('payouts.yaml has no plans');
+const leadPerson = perPersonPerYear(lead, pop);
+const leadCouple = householdPerYear(lead, pop, { adults: 2, children: 0 }) / 12;
+const rate = lead.kind === 'fund' ? lead.payoutRate : 0.05;
+const salaryFund = fundNeeded(1000, rate, pop);
+const leadFund = lead.kind === 'fund' ? lead.fundUsd : null;
+const reviewed = file.reviewedOn instanceof Date ? file.reviewedOn.toISOString().slice(0, 10) : String(file.reviewedOn);
+const title = 'What would you actually get: The Trigger';
+const description = `The largest AI dividend bill in Congress pays about $${Math.round(leadPerson / 12)} a month per person. A household of two: $${Math.round(leadCouple)}. Every figure cited.`;
+---
+<Base title={title} description={description} page="calculator">
+  <section class="headline">
+    <h1>What would you actually get? <span>About ${Math.round(leadPerson / 12)} a month.</span></h1>
+    <p class="lede">
+      "AI dividend" sounds like a salary. The largest plan in Congress, {lead.name.split(',')[0]}, pays about{' '}
+      <span class="num">${Math.round(leadPerson).toLocaleString('en-US')}</span> a year per person, by its sponsor's own numbers.
+      Enter your household to see every plan on the table.
+    </p>
+  </section>
+
+  <section class="panel">
+    <Calculator client:load plans={plans} population={{ everyone: pop.everyone }} />
+    <p class="small muted" style="margin-top:12px">
+      Fund plans divide the annual payout by the US resident population,{' '}
+      <span class="num">{(pop.everyone / 1e6).toFixed(1)}M</span>{' '}<SourceCite href={pop.sourceUrl} name={pop.sourceName} asOf={String(pop.asOf instanceof Date ? pop.asOf.toISOString().slice(0, 10) : pop.asOf)} />.
+      Children count where the plan includes them. Plans and figures: <a href={fileUrl('sources/curated/payouts.yaml')}>payouts.yaml</a>, reviewed {reviewed}.
+    </p>
+  </section>
+
+  <section class="contrast">
+    <div class="panel contrast-cell">
+      <div class="contrast-value num amber">${Math.round(leadPerson / 12)}</div>
+      <div class="contrast-label">per person per month under {lead.name.split(',')[0]}, if it passed as written</div>
+      <SourceCite href={lead.sourceUrl} name={lead.sourceName} />
+    </div>
+    <div class="contrast-vs mono" aria-hidden="true">vs</div>
+    <div class="panel contrast-cell">
+      <div class="contrast-value num red">{fmtNumber(salaryFund, 'USD')}</div>
+      <div class="contrast-label">
+        fund needed to pay everyone $1,000 a month at the same {Math.round(rate * 100)}% payout
+        {leadFund ? <>, <span class="num">{(salaryFund / leadFund).toFixed(0)}×</span> the fund in the bill</> : null}
+      </div>
+      <a class="small" href={fileUrl('index/payouts.ts')}>arithmetic</a>
+    </div>
+  </section>
+
+  <section class="panel prose" style="max-width:none">
+    <h2 style="margin-top:0">What this does not say</h2>
+    <ul>
+      <li>None of these plans is law. The index puts the first federal check at <a href={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/method#projection`}>{quarter}</a>, ±{latest.bandMonths} months, and the plan that passes may look nothing like these.</li>
+      <li>A fund's value moves with the companies it owns. The $7 trillion is the sponsor's estimate at current valuations; a 30% drawdown cuts the check by 30%.</li>
+      <li>Dividends this size are usually taxable income and can interact with benefit eligibility. Alaska's is taxed federally.</li>
+    </ul>
+  </section>
+</Base>

@@ -1,0 +1,62 @@
+# What a dividend would actually pay. Read at build time by the calculator
+# (web/src/pages/calculator.astro); arithmetic in index/payouts.ts.
+#
+# Each plan states its money the way its sponsor does:
+#   fund      fundUsd x payoutRate, split across eligible people each year
+#   perPerson a fixed amount per eligible person per period
+# eligible: everyone (children included) | adults (18+).
+reviewedOn: 2026-10-14
+maxAgeDays: 180
+
+population:
+  everyone: 341800000
+  asOf: 2025-07-01
+  sourceName: U.S. Census Bureau, Vintage 2025 estimates
+  sourceUrl: https://www.census.gov/newsroom/press-releases/2026/population-growth-slows.html
+  note: "341.8 million residents on July 1, 2025"
+
+plans:
+  - id: s4825
+    name: S. 4825, American A.I. Sovereign Wealth Fund Act
+    status: Introduced Jun 18 2026, in Senate Finance
+    kind: fund
+    fundUsd: 7000000000000
+    payoutRate: 0.05
+    eligible: everyone
+    recurring: true
+    basis: "Sponsor's figures: a fund worth an estimated $7 trillion paying a 5% annual dividend, 'more than $1,000 to everyone in America'"
+    sourceName: Sen. Sanders press release
+    sourceUrl: https://www.sanders.senate.gov/press-releases/news-sanders-introduces-legislation-to-create-7-trillion-ai-sovereign-wealth-fund/
+  - id: openai5
+    name: OpenAI's 5% equity proposal, paid out the same way
+    status: Floated Jul 2026, not binding
+    kind: fund
+    fundUsd: 42600000000
+    payoutRate: 0.05
+    eligible: everyone
+    recurring: true
+    basis: "5% of OpenAI at its $852B post-money valuation, paid out at S. 4825's 5% rate. Our arithmetic, not a figure OpenAI published"
+    sourceName: TechCrunch / FT
+    sourceUrl: https://techcrunch.com/2026/07/02/openai-proposed-donating-5-of-its-equity-to-a-us-sovereign-wealth-fund/
+  - id: alaska
+    name: Alaska Permanent Fund Dividend, 2026
+    status: Paid since 1982; Alaska residents only
+    kind: perPerson
+    amountUsd: 1200
+    periodsPerYear: 1
+    eligible: everyone
+    recurring: true
+    basis: "$1,200 per eligible resident, children included"
+    sourceName: Alaska Department of Revenue
+    sourceUrl: https://dor.alaska.gov/department-of-revenue/news-detail/2026/09/28/department-of-revenue-announces-2026-permanent-fund-dividend-amount
+  - id: arpa
+    name: 2021 pandemic stimulus check (for scale)
+    status: Paid once, March 2021
+    kind: perPerson
+    amountUsd: 1400
+    periodsPerYear: 1
+    eligible: everyone
+    recurring: false
+    basis: "$1,400 per eligible individual and per dependent, phased out at higher incomes"
+    sourceName: IRS, third Economic Impact Payment
+    sourceUrl: https://www.irs.gov/coronavirus/third-economic-impact-payment

@@ -16,6 +16,7 @@ import { normalize } from '../../../index/normalize.ts';
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const method = (hash = '') => `${base}/method${hash}`;
 const snapUrl = snapshotUrl(latest);
+const siteRoot = `${(Astro.site?.toString() ?? '').replace(/\/$/, '')}${base}`;
 
 const subKeys = Object.keys(weights.subIndices);
 const metricsFor = (key: string | null) =>
@@ -205,6 +206,15 @@ const openPredictions = ledger.predictions.filter((p) => p.status === 'open');
       </div>
     </section>
   )}
+
+  <section class="panel">
+    <div class="panel-head"><h2>Embed the live number</h2><a class="small" href={`${base}/badge.svg`}>badge.svg</a></div>
+    <div class="embed">
+      <img src={`${base}/badge.svg`} alt={`AI dividend readiness ${latest.readiness.toFixed(1)}/100`} height="20" />
+      <code>{`<a href="${siteRoot}/"><img src="${siteRoot}/badge.svg" alt="AI dividend readiness, The Trigger"></a>`}</code>
+    </div>
+    <p class="small muted" style="margin:8px 0 0">Rebuilt with every daily snapshot.</p>
+  </section>
 
   <section class="two-col">
     <div class="panel">

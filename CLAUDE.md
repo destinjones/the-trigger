@@ -21,7 +21,7 @@ Open-source tracker of US readiness for an AI-funded citizen dividend. Read READ
 - `sources/` one module per source implementing `Source` from `_types.ts`; register in `sources/index.ts`. Use `ctx.http` (never global fetch) so runs can be recorded/replayed, and `ctx.today` (never the clock).
 - `sources/curated/*.yaml` hand-maintained values with deep links; fail when `reviewedOn` is older than `maxAgeDays`.
 - `scripts/lib/run.ts` runner: isolates failures, carries last values forward with `stale: true`.
-- `web/` Astro + Preact components. Only `Clock` hydrates (`client:load`).
+- `web/` Astro + Preact components. Only `Clock` and `Calculator` hydrate (`client:load`); both render complete HTML at build time first.
 - `fixtures/cassettes/` recorded upstream responses for tests.
 
 ## Adding a source
