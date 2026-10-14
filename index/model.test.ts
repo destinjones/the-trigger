@@ -17,6 +17,7 @@ import type { SourceResult } from '../sources/_types.ts';
 
 const weightsText = readFileSync(fileURLToPath(new URL('./weights.v1.yaml', import.meta.url)), 'utf8');
 const W = parseWeights(weightsText);
+const W2 = parseWeights(readFileSync(fileURLToPath(new URL('./weights.v2.yaml', import.meta.url)), 'utf8'));
 
 function m(metricId: string, value: number): SourceResult {
   return {
@@ -146,8 +147,15 @@ describe('weights', () => {
     expect(() => parseWeights('version: x\nsubIndices:\n  a: { weight: 1 }\nmetrics:\n  bogus.metric: a\n')).toThrow(/no transform/);
     expect(() => parseWeights('version: x\nsubIndices:\n  a: { weight: 1 }\nmetrics:\n  labor.unemployment_rate: b\n')).toThrow(/unknown sub-index/);
   });
-  it('every scored transform is mapped in v1', () => {
-    for (const id of Object.keys(TRANSFORMS)) expect(id in W.metrics, id).toBe(true);
+  it('every transform is mapped (scored or null) in the default weights, v2', () => {
+    for (const id of Object.keys(TRANSFORMS)) expect(id in W2.metrics, id).toBe(true);
+  });
+  it('v2 demotes fiscal pressure and groups every sub-index', () => {
+    expect(W2.version).toBe('v2');
+    expect(W2.subIndices.fiscal_pressure?.weight).toBe(0.05);
+    expect(W2.subIndices.labor_dislocation?.weight).toBe(0.3);
+    for (const [k, d] of Object.entries(W2.subIndices)) expect(['pressure', 'response', 'backdrop'], k).toContain(d.group);
+    expect(W2.metrics['corporate.equity_pipeline_usd']).toBe('corporate_equity');
   });
 });
 

@@ -26,7 +26,7 @@ const DATA = join(ROOT, 'data');
 const { values: args } = parseArgs({
   options: {
     date: { type: 'string' },
-    weights: { type: 'string', default: 'v1' },
+    weights: { type: 'string', default: 'v2' },
     record: { type: 'string' },
     replay: { type: 'string' },
     revise: { type: 'boolean', default: false },

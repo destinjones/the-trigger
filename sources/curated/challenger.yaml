@@ -18,3 +18,12 @@ metrics:
     # 2025 full year: https://www.challengergray.com/blog/2025-year-end-challenger-report-highest-q4-layoffs-since-2008-lowest-ytd-hiring-since-2010/
     # 2025 Oct:       https://www.challengergray.com/blog/october-challenger-report-153074-job-cuts-on-cost-cutting-ai/
     note: "Derived: 120,136 cut YTD 2026 (21% of all cuts) plus Oct–Dec 2025"
+  - metricId: labor.ai_layoffs_ytd
+    label: AI-attributed job cuts, 2026 to date
+    value: 120136
+    unit: jobs
+    asOf: 2026-09-30
+    sourceName: Challenger, Gray & Christmas, Sept 2026 report
+    sourceUrl: https://www.challengergray.com/blog/job-cuts-fall-in-september-hiring-plans-up-3-over-2025-on-weak-early-seasonal-hiring/
+    verified: true
+    note: "Jan–Sep 2026, employer cited AI. 21% of all announced cuts. Unscored: the trailing-12-month figure is the scored one"

@@ -1,6 +1,6 @@
 ---
 import '../styles/global.css';
-import { REPO_URL, latest } from '../lib/data.ts';
+import { REPO_URL, latest, weightsPath } from '../lib/data.ts';
 
 interface Props {
   title: string;
@@ -9,6 +9,10 @@ interface Props {
 }
 const { title, description, page } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const site = (Astro.site?.toString() ?? '').replace(/\/$/, '');
+const pageUrl = `${site}${Astro.url.pathname}`;
+// Rendered at build time from the latest snapshot by src/pages/og.png.ts.
+const ogImage = `${site}${base}/og.png`;
 ---
 <!doctype html>
 <html lang="en">
@@ -17,8 +21,20 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <link rel="canonical" href={pageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="The Trigger" />
+    <meta property="og:url" content={pageUrl} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={description} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
     <link rel="icon" href={`${base}/favicon.svg`} type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -28,7 +44,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     <header class="topbar">
       <div class="wrap">
         <a class="brand" href={`${base}/`}>THE TRIGGER<span>_</span></a>
-        <span class="muted mono">snapshot {latest.date} r{latest.revision}</span>
+        <span class="muted mono snap">snapshot {latest.date} r{latest.revision}</span>
         <nav>
           <a href={`${base}/`} aria-current={page === 'index' ? 'page' : undefined}>Tracker</a>
           <a href={`${base}/method`} aria-current={page === 'method' ? 'page' : undefined}>Method</a>
@@ -42,7 +58,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
     <footer class="site">
       <div class="wrap">
         <a href={`${base}/method`}>Method and known weaknesses (required reading)</a>
-        <a href={`${REPO_URL}/blob/main/index/weights.v1.yaml`}>Fork the weights</a>
+        <a href={`${REPO_URL}/blob/main/${weightsPath}`}>Fork the weights</a>
         <a href={`${REPO_URL}/blob/main/SCOREBOARD.md`}>Our prediction record</a>
         <a href={`${REPO_URL}/blob/main/DATA_LICENSE.md`}>Data sources and terms</a>
         <a href={`${REPO_URL}/commits/main/data`}>Every snapshot (git history)</a>

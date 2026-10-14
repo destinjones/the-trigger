@@ -10,6 +10,7 @@ import SourceCite from '../components/SourceCite.tsx';
 import Sparkline from '../components/Sparkline.tsx';
 import { fileUrl, latest, ledger, metric, previous, series, snapshotUrl, weights } from '../lib/data.ts';
 import { fmtNumber } from '../lib/format.ts';
+import { cuts, cutsLabel, description, gapCopy, moved, movedLabel, title } from '../lib/headline.ts';
 import { normalize } from '../../../index/normalize.ts';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
@@ -26,17 +27,63 @@ const gap = (s: typeof latest) => {
   return d === null || p === null || d === undefined || p === undefined ? null : d - p;
 };
 const gapNow = gap(latest);
+const gapText = gapCopy(gapNow, latest.subIndices.labor_dislocation, latest.subIndices.political_momentum);
+
+// Sub-indices grouped by the `group` each one declares in the weights file.
+const GROUP_COPY: Record<string, { title: string; sub: string }> = {
+  pressure: { title: 'Pressure', sub: 'what forces a dividend' },
+  response: { title: 'Response', sub: 'who is moving toward one' },
+  backdrop: { title: 'Backdrop', sub: 'what makes one possible' },
+};
+const groupKeys = [...new Set(subKeys.map((k) => weights.subIndices[k]?.group ?? 'all'))];
+const groups = groupKeys.map((g) => ({
+  ...(GROUP_COPY[g] ?? { title: 'Sub-indices', sub: `weights ${latest.weightsVersion}` }),
+  keys: subKeys.filter((k) => (weights.subIndices[k]?.group ?? 'all') === g),
+}));
 const gapSeries = series(gap);
 
 const filings = latest.filings ?? [];
 const edgarMetric = metric(latest, 'corporate.capex_headcount_gap_pp');
 const openPredictions = ledger.predictions.filter((p) => p.status === 'open');
 ---
-<Base
-  title="The Trigger: AI dividend readiness tracker"
-  description={`Readiness ${latest.readiness}/100. Projected first federal AI dividend ${latest.projectedDate} ±${latest.bandMonths} months, ${Math.round(latest.confidence * 100)}% confidence. Every number cited.`}
-  page="index"
->
+<Base title={title} description={description} page="index">
+  <section class="headline">
+    <h1>The layoffs started. <span>The checks haven't.</span></h1>
+    <p class="lede">
+      The Trigger tracks how close the US is to paying every citizen a dividend funded by AI.
+      Every number is cited, every snapshot is in git, and every projection is graded in public.
+    </p>
+  </section>
+
+  <section class="contrast">
+    <div class="panel contrast-cell">
+      <div class="contrast-value num red">{cuts ? cuts.value.toLocaleString('en-US') : 'no data'}</div>
+      <div class="contrast-label">{cutsLabel}</div>
+      {cuts && <SourceCite href={cuts.sourceUrl} name={cuts.sourceName} asOf={cuts.asOf} stale={cuts.stale} />}
+    </div>
+    <div class="contrast-vs mono" aria-hidden="true">vs</div>
+    <div class="panel contrast-cell">
+      <div class={`contrast-value num ${moved && moved.value === 0 ? 'red' : 'amber'}`}>{moved ? moved.value : 'no data'}</div>
+      <div class="contrast-label">{movedLabel}{moved && moved.value === 0 && latest.bills.length > 0 ? `, of ${latest.bills.filter((b) => b.status !== 'expired').length} introduced` : ''}</div>
+      {moved && <SourceCite href={moved.sourceUrl} name={moved.sourceName} asOf={moved.asOf} stale={moved.stale} />}
+    </div>
+  </section>
+
+  <section class="panel gap">
+    <div class="panel-head">
+      <h2>The gap: labor dislocation minus political momentum</h2>
+      <SourceCite href={snapUrl} name="snapshot sub-indices" />
+    </div>
+    <div class="gap-row">
+      <span class={`gap-value num ${gapNow !== null && gapNow > 2 ? 'red' : 'amber'}`}>{gapNow === null ? '—' : `${gapNow >= 0 ? '+' : '−'}${Math.abs(gapNow).toFixed(1)}`}</span>
+      <div>
+        <div class="gap-head">{gapText.head}</div>
+        <p class="small muted">{gapText.body}</p>
+      </div>
+      <Sparkline points={gapSeries} width={140} color="var(--violet)" />
+    </div>
+  </section>
+
   <div class="hero">
     <div class="panel">
       <Clock
@@ -67,41 +114,31 @@ const openPredictions = ledger.predictions.filter((p) => p.status === 'open');
     </div>
   </div>
 
-  <section>
-    <div class="grid subindices">
-      {subKeys.map((k) => (
-        <div class="panel">
-          <SubIndex
-            label={weights.subIndices[k]?.label ?? k}
-            value={latest.subIndices[k] ?? null}
-            weight={weights.subIndices[k]?.weight ?? 0}
-            metricCount={metricsFor(k).length}
-            citeHref={snapUrl}
-            methodHref={method(`#${k}`)}
-          />
+  <section class="groups">
+    {groups.map((g) => (
+      <div class="group">
+        <div class="group-title"><b>{g.title}</b><span>{g.sub}</span></div>
+        <div class="grid">
+          {g.keys.map((k) => (
+            <div class="panel">
+              <SubIndex
+                label={weights.subIndices[k]?.label ?? k}
+                value={latest.subIndices[k] ?? null}
+                weight={weights.subIndices[k]?.weight ?? 0}
+                metricCount={metricsFor(k).length}
+                citeHref={snapUrl}
+                methodHref={method(`#${k}`)}
+              />
+            </div>
+          ))}
         </div>
-      ))}
-    </div>
-  </section>
-
-  <section class="panel">
-    <div class="panel-head">
-      <h2>The gap: dislocation minus political response</h2>
-      <SourceCite href={snapUrl} name="snapshot sub-indices" />
-    </div>
-    <div class="metric-row">
-      <span class="metric-value num">{gapNow === null ? 'no data' : `${gapNow >= 0 ? '+' : '−'}${Math.abs(gapNow).toFixed(1)}`}</span>
-      <span class="small muted">
-        labor dislocation {latest.subIndices.labor_dislocation?.toFixed(1) ?? '—'} vs political momentum {latest.subIndices.political_momentum?.toFixed(1) ?? '—'}.
-        Positive means pain is outrunning the response; that is when the thesis says the response gets forced.
-      </span>
-      <Sparkline points={gapSeries} width={140} color="var(--violet)" />
-    </div>
+      </div>
+    ))}
   </section>
 
   {subKeys.map((k) => metricsFor(k).length > 0 && (
     <section>
-      <div class="group-title"><b>{weights.subIndices[k]?.label}</b><span>{metricsFor(k).length} inputs</span></div>
+      <div class="group-title"><b>{weights.subIndices[k]?.label}</b><span>{metricsFor(k).length} input{metricsFor(k).length === 1 ? "" : "s"}</span></div>
       <div class="grid metrics">
         {metricsFor(k).map((m) => (
           <MetricCard metric={m} prior={metric(previous, m.metricId)} score={normalize(m.metricId, m.value)} history={series((s) => metric(s, m.metricId)?.value)} />
@@ -116,7 +153,7 @@ const openPredictions = ledger.predictions.filter((p) => p.status === 'open');
       <div class="table-wrap">
         <table class="table">
           <thead><tr><th>Latest</th><th>Bill</th><th>Co-sp.</th><th>Status</th><th>Source</th></tr></thead>
-          <tbody>{latest.bills.map((b) => <BillRow bill={b} />)}</tbody>
+          <tbody>{latest.bills.map((b) => <BillRow bill={b} today={latest.date} />)}</tbody>
         </table>
       </div>
     </div>

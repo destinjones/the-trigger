@@ -11,5 +11,7 @@ export default defineConfig({
   integrations: [preact()],
   vite: {
     server: { fs: { allow: ['..'] } },
+    // Native rasterizer for the build-time share card (src/pages/og.png.ts).
+    ssr: { external: ['@resvg/resvg-js'] },
   },
 });

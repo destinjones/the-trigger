@@ -20,8 +20,15 @@ are released under CC0.
 | Kalshi | Market price on federal household checks (unscored) | No key, public market data | Kalshi terms of service. Prices are recorded for calibration, not redistributed as a feed. |
 | Challenger, Gray & Christmas | Job cuts attributed to AI (curated) | Monthly public reports; no API | Figures are facts reported in public press releases, cited by deep link. Our trailing-12-month figure is our own arithmetic. |
 | Guaranteed Income Pilots Dashboard (guaranteedincome.us) and program records | Pilot and permanent program counts, cash disbursed, recipients (curated) | Public pages; no API | Cited by deep link. Totals marked unverified where the publisher does not state them. |
-| National polls (e.g. Manhattan Institute) | Support for a basic income (curated) | Public releases | Cited by deep link with sponsor, sample and field dates. |
+| National polls (Manhattan Institute, Data for Progress, AP-NORC) | Support for a basic income, weighted average (curated) | Public releases and toplines | Cited by deep link with sponsor, sample, field dates and question wording. |
+| OpenAI announcements | Valuation used to size the 5% equity proposal (curated) | Public pages | Cited by deep link. |
 | News reports (TechCrunch, CNBC, Economic Security Project, Alaska Department of Revenue) | Corporate proposals, actor roster (curated) | Public pages | Cited by deep link. We record facts, not article text. |
+
+## Fonts
+
+`web/og/fonts/` holds IBM Plex Mono (Copyright 2017 IBM Corp.) under the SIL Open
+Font License 1.1, included as `web/og/fonts/OFL.txt`. It is used only to render the
+share card at build time.
 
 ## Recorded responses
 

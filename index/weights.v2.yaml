@@ -1,0 +1,75 @@
+# v2 — 2026-10-14. Supersedes v1 as the default. v1 stays published and runnable.
+#
+# What changed from v1, and why:
+#   1. fiscal_pressure 0.15 -> 0.05. The deficit says whether the government is
+#      stretched, not whether AI is displacing anyone, and its sign is ambiguous
+#      (a stretched budget argues against new universal spending as much as for
+#      it). In v1 it carried more of the composite than labor dislocation did.
+#   2. labor_dislocation 0.25 -> 0.30. It is the thesis.
+#   3. corporate_equity 0.10 -> 0.15, and it now scores the equity pipeline:
+#      proposals count at a discount by how firm they are (binding 1.0, signed
+#      0.6, reported talks 0.3, floated 0.15) against a reachable $25B anchor.
+#      v1 counted binding commitments only, which pinned the sub-index at 0 on the
+#      liveliest story in the data.
+#   4. public_opinion is now a weighted mean of several national polls (sample
+#      size x recency, partisan sponsors at half weight) instead of one poll.
+#      The weight is unchanged; the input is better.
+#
+# Fork it and argue with us: copy to weights.v3.yaml, never edit this file.
+
+version: v2
+
+subIndices:
+  labor_dislocation:
+    weight: 0.30  # unemployment, payrolls trend, entry-level postings, AI-attributed layoffs
+    label: Labor dislocation
+    group: pressure
+  political_momentum:
+    weight: 0.20  # active bills, co-sponsors, committee movement, EOs
+    label: Political momentum
+    group: response
+  public_opinion:
+    weight: 0.15  # weighted mean of national polls
+    label: Public opinion
+    group: response
+  corporate_equity:
+    weight: 0.15  # equity pipeline (discounted proposals), AI capex vs headcount
+    label: Corporate equity
+    group: response
+  precedent:
+    weight: 0.15  # permanent programs, $ disbursed, recipients
+    label: Precedent
+    group: backdrop
+  fiscal_pressure:
+    weight: 0.05  # deficit, debt service. Kept, demoted: context, not cause.
+    label: Fiscal pressure
+    group: backdrop
+
+metrics:
+  labor.unemployment_rate: labor_dislocation
+  labor.payrolls_3mo_avg_change: labor_dislocation
+  labor.white_collar_openings_yoy: labor_dislocation
+  labor.ai_layoffs_ttm: labor_dislocation
+
+  politics.bills_with_committee_movement: political_momentum
+  politics.cosponsors_total: political_momentum
+  politics.ai_executive_actions_12mo: political_momentum
+
+  opinion.ubi_support_pct: public_opinion
+
+  corporate.equity_pipeline_usd: corporate_equity
+  corporate.capex_headcount_gap_pp: corporate_equity
+
+  precedent.permanent_programs: precedent
+  precedent.cash_disbursed_usd: precedent
+  precedent.recipients: precedent
+
+  fiscal.deficit_pct_gdp: fiscal_pressure
+  fiscal.interest_pct_receipts: fiscal_pressure
+
+  # Unscored
+  labor.ai_layoffs_ytd: null              # display only; ttm is the scored figure
+  corporate.equity_commitments_usd: null   # binding only; folded into the pipeline at weight 1.0
+  markets.passage_probability: null
+  politics.govtrack_prognosis_max: null
+  politics.state_bills_active: null

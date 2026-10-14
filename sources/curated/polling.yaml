@@ -1,15 +1,37 @@
-# National polls on a federal basic income. The index uses the most recent
-# poll (by field end date). Add every new national poll you can cite; older
-# ones stay for the record.
+# National polls on a federal basic income. The metric is a weighted mean of
+# every poll below (see sources/polling.ts): sqrt(n) x one-year half-life,
+# partisan sponsors at half weight, polls older than three years dropped.
+# Add every new national poll you can cite. Old ones stay for the record.
+#
+# Checked and left out (2026-10-14): YouGov Daily Questions 2023-02-14 (61%
+# support, no sample size published, older than three years); Pew 2020 and
+# Gallup 2018 (too old); More in Common 2026 (forced choice, not
+# support/oppose); Windfall Trust / CIP via TIME (60 countries, not US-only).
 reviewedOn: 2026-10-14
 maxAgeDays: 365
-metrics:
-  - metricId: opinion.ubi_support_pct
-    label: Support for a universal basic income
-    value: 32
-    unit: "%"
-    asOf: 2026-07-06
-    sourceName: Manhattan Institute national survey, n=1,121
+polls:
+  - pollster: Manhattan Institute
+    fieldEnd: 2026-07-06
+    n: 1121
+    support: 32
+    oppose: 50
+    partisan: right
+    question: "A monthly payment to every adult regardless of income or work that would require significant government funding. Likely voters, Jul 1-6, 2026."
     sourceUrl: https://manhattan.institute/article/american-attitudes-on-welfare-waste-crime-and-the-political-environment
-    verified: true
-    note: "32% support, 50% oppose a monthly payment to every adult. Fielded Jul 1–6, 2026; right-leaning sponsor"
+  - pollster: Data for Progress
+    fieldEnd: 2026-06-16
+    n: 1090
+    support: 59
+    oppose: 29
+    partisan: left
+    question: "Creating a Universal Basic Income program, which would provide a monthly stimulus check to every American. Likely voters, in a battery on AI and the workforce."
+    sourceUrl: https://www.filesforprogress.org/datasets/2026/7/dfp_ai_workforce_solutions.pdf
+  - pollster: AP-NORC
+    sponsor: University of Chicago Harris School
+    fieldEnd: 2025-08-25
+    n: 1121
+    support: 23
+    oppose: 46
+    partisan: null
+    question: "Providing a universal basic income. US adults, Aug 21-25, 2025."
+    sourceUrl: https://apnorc.org/projects/many-believe-poverty-and-homelessness-are-increasing-and-feel-the-government-has-a-responsibility-to-address-the-issues/

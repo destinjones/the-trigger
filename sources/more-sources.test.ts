@@ -8,9 +8,9 @@ import {
 } from './edgar.ts';
 import { kalshi, marketPct } from './kalshi.ts';
 import { pilots } from './pilots.ts';
-import { polling } from './polling.ts';
+import { aggregatePolls, pollWeight, polling, type Poll } from './polling.ts';
 import { challenger } from './challenger.ts';
-import { corporate } from './corporate.ts';
+import { corporate, pipeline, type Commitment } from './corporate.ts';
 import { legiscan } from './legiscan.ts';
 import { runSources, type Snapshot } from '../scripts/lib/run.ts';
 
@@ -142,6 +142,46 @@ describe('curated sources', () => {
   it('corporate carries the who-is-moving roster', async () => {
     const out = await corporate.fetchRich(ctx(none));
     expect(out.actors?.length).toBeGreaterThan(3);
+  });
+  it('corporate scores the pipeline with discounts, binding at face value', async () => {
+    const r = await corporate.fetch(ctx(none));
+    const pipe = r.find((m) => m.metricId === 'corporate.equity_pipeline_usd');
+    expect(pipe?.value).toBe(Math.round(42_600_000_000 * 0.15));
+    expect(r.find((m) => m.metricId === 'corporate.equity_commitments_usd')?.value).toBe(0);
+  });
+  it('pipeline discounts by status and skips unsized entries', () => {
+    const c = (status: Commitment['status'], valueUsd: number | null): Commitment =>
+      ({ entity: 'x', what: 'x', status, valueUsd, asOf: '2026-01-01', sourceUrl: 'https://x.test', sourceName: 'x' });
+    expect(pipeline([c('binding', 10), c('signed', 10), c('reported', 10), c('floated', 100), c('reported', null)]))
+      .toEqual({ binding: 10, discounted: 10 + 6 + 3 + 15, counted: 4 });
+    expect(() => pipeline([c('rumored' as Commitment['status'], 1)])).toThrow(/unknown status/);
+  });
+  it('polls aggregate by sqrt(n), recency, and partisan half weight', () => {
+    const p = (support: number, n: number, fieldEnd: string, partisan: Poll['partisan'] = null): Poll =>
+      ({ pollster: `p${support}`, fieldEnd, n, support, partisan, question: 'q', sourceUrl: 'https://x.test' });
+    const today = '2026-10-14';
+    // Same date, n 4x larger -> weight 2x.
+    expect(pollWeight(p(1, 4000, today), today) / pollWeight(p(1, 1000, today), today)).toBeCloseTo(2);
+    // One year older -> half.
+    expect(pollWeight(p(1, 1000, '2025-10-14'), today) / pollWeight(p(1, 1000, today), today)).toBeCloseTo(0.5, 2);
+    // Partisan -> half. Too old, future, or no n -> zero.
+    expect(pollWeight(p(1, 1000, today, 'left'), today) / pollWeight(p(1, 1000, today), today)).toBeCloseTo(0.5);
+    expect(pollWeight(p(1, 1000, '2022-01-01'), today)).toBe(0);
+    expect(pollWeight(p(1, 1000, '2026-12-01'), today)).toBe(0);
+    expect(pollWeight(p(1, 0, today), today)).toBe(0);
+    // Two equal-weight polls average; a left and right poll of equal size cancel lean.
+    expect(aggregatePolls([p(20, 1000, today), p(60, 1000, today)], today)?.support).toBeCloseTo(40);
+    expect(aggregatePolls([p(30, 1000, today, 'right'), p(60, 1000, today, 'left'), p(40, 1000, today)], today)?.support)
+      .toBeCloseTo((30 * 0.5 + 60 * 0.5 + 40) / 2);
+    expect(aggregatePolls([], today)).toBeNull();
+  });
+  it('polling publishes one averaged metric over the curated polls', async () => {
+    const r = await polling.fetch(ctx(none));
+    const m = r.filter((x) => x.metricId === 'opinion.ubi_support_pct');
+    expect(m).toHaveLength(1);
+    expect(m[0]?.sourceName).toMatch(/Weighted mean of 3 national polls/);
+    expect(m[0]?.value).toBeGreaterThan(30);
+    expect(m[0]?.value).toBeLessThan(45);
   });
   it('fail once nobody has re-reviewed them', () => {
     expect(() => curatedOutput({ reviewedOn: '2026-01-01', maxAgeDays: 30, metrics: [] }, 'x', '2026-10-14')).toThrow(/last reviewed/);

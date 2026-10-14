@@ -44,10 +44,19 @@ export function fmtMonth(iso: string): string {
   return `${MONTHS[m - 1]} ${y}`;
 }
 
-/** Color token for a 0–100 score. */
+/**
+ * Color token for a 0–100 score, by how far along it is: red has barely
+ * started, amber is underway, green is close to the trigger.
+ */
 export function scoreColor(v: number | null): string {
   if (v === null) return 'var(--muted)';
-  if (v < 34) return 'var(--cyan)';
-  if (v < 67) return 'var(--amber)';
-  return 'var(--red)';
+  if (v < 25) return 'var(--red)';
+  if (v < 50) return 'var(--amber)';
+  return 'var(--green)';
+}
+
+/** A bill with no recorded action for this long is shown as dead. */
+export const DEAD_AFTER_DAYS = 180;
+export function daysSince(iso: string, today: string): number {
+  return Math.round((Date.parse(`${today}T00:00:00Z`) - Date.parse(`${iso}T00:00:00Z`)) / 86_400_000);
 }

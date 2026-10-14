@@ -2,7 +2,9 @@
 import Base from '../layouts/Base.astro';
 import { TRANSFORMS } from '../../../index/normalize.ts';
 import { PROJECTION, project } from '../../../index/model.ts';
-import { REPO_URL, fileUrl, latest, weights } from '../lib/data.ts';
+import { REPO_URL, fileUrl, latest, weights, weightsPath } from '../lib/data.ts';
+import { DISCOUNTS } from '../../../sources/corporate.ts';
+import { POLL_HALF_LIFE_DAYS, POLL_MAX_AGE_DAYS } from '../../../sources/polling.ts';
 
 const subKeys = Object.keys(weights.subIndices);
 const metricsOf = (k: string) => Object.entries(weights.metrics).filter(([, s]) => s === k).map(([id]) => id);
@@ -31,8 +33,8 @@ const fixture = project(34, 88, '2026-10-14');
 
     <h2 id="weights">Weighting</h2>
     <p>
-      The weights are an editorial judgment, kept in <a href={fileUrl('index/weights.v1.yaml')}>index/weights.v1.yaml</a> with a
-      comment on each line. The model contains no weights of its own. To argue with them, copy the file to a new version,
+      The weights are an editorial judgment, kept in <a href={fileUrl(weightsPath)}>{weightsPath}</a> with a
+      comment on each line. Published versions are never edited; v1 stays in the repo and still runs. The model contains no weights of its own. To argue with them, copy the file to a new version,
       change it, run <code>pnpm snapshot</code>, and open a pull request with the score your weights produce.
     </p>
     <table class="table">
@@ -52,6 +54,49 @@ const fixture = project(34, 88, '2026-10-14');
       Composite = Σ weight × sub-index. A sub-index is the mean of its normalized metrics. If a sub-index has no data in a
       run, it is dropped and the remaining weights are rescaled to sum to 1; the snapshot records the share of weight
       that was fed (<code>weightCovered</code>, now {Math.round(latest.weightCovered * 100)}%).
+    </p>
+
+    <h3>What changed in v2</h3>
+    <ul>
+      <li><b>Fiscal pressure 0.15 → 0.05.</b> The deficit says whether the government is stretched, not whether AI is displacing anyone, and its sign is ambiguous. In v1 it carried as much weight as public opinion.</li>
+      <li><b>Labor dislocation 0.25 → 0.30.</b> It is the thesis.</li>
+      <li><b>Corporate equity 0.10 → 0.15, and it now scores the pipeline.</b> v1 counted binding commitments only against a $100B anchor, which pinned the sub-index at 0 while the largest live proposal in the data sat unscored.</li>
+      <li><b>Public opinion averages several polls</b> instead of reading the latest one. Same weight, better input.</li>
+    </ul>
+
+    <h3 id="polls">Poll average</h3>
+    <p>
+      Each national poll in <a href={fileUrl('sources/curated/polling.yaml')}>polling.yaml</a> gets weight
+      √n × 0.5<sup>age / {POLL_HALF_LIFE_DAYS} days</sup>, halved again if the sponsor or pollster leans left or right.
+      Polls older than {Math.round(POLL_MAX_AGE_DAYS / 365)} years drop out. √n because sampling error shrinks with √n.
+      Partisan polls count half rather than zero: they are still data, and a left and a right poll of equal size
+      offset each other's lean.
+    </p>
+
+    <h3 id="pipeline">Equity pipeline</h3>
+    <p>
+      Every proposal for AI firms to put equity or cash into a public fund is listed in
+      <a href={fileUrl('sources/curated/corporate.yaml')}>corporate.yaml</a> with a status, and counts at a discount:
+    </p>
+    <table class="table">
+      <thead><tr><th>Status</th><th>Counts at</th><th>Means</th></tr></thead>
+      <tbody>
+        <tr><td>binding</td><td class="num">×{DISCOUNTS.binding}</td><td>Legally enforceable and dated.</td></tr>
+        <tr><td>signed</td><td class="num">×{DISCOUNTS.signed}</td><td>Signed letter or term sheet, not yet enforceable.</td></tr>
+        <tr><td>reported</td><td class="num">×{DISCOUNTS.reported}</td><td>Talks reported by named outlets.</td></tr>
+        <tr><td>floated</td><td class="num">×{DISCOUNTS.floated}</td><td>Op-ed, interview, or proposal with no counterparty.</td></tr>
+      </tbody>
+    </table>
+    <p class="small muted" style="margin-top:8px">
+      A proposal with no reported size is listed and counts $0. The binding-only total is still recorded, unscored.
+    </p>
+
+    <h3 id="gap">The gap</h3>
+    <p>
+      Labor dislocation minus political momentum. Positive means pain is outrunning the response, the condition the
+      thesis says forces checks. Negative means elites are front-running the crisis: bills, executive orders and equity
+      proposals are arriving before the job losses show up in the labor data. Neither is good or bad on its own; the
+      direction of travel is the signal.
     </p>
 
     <h2 id="normalization">Normalization</h2>
@@ -130,9 +175,11 @@ bandMonths    = (100 − readiness) / 100 × ${PROJECTION.maxBandMonths}`}</pre>
       <li><b>Executive action is counted bluntly.</b> The Federal Register metric counts presidential documents whose text mentions artificial intelligence. Some are about AI; some mention it in passing. It measures attention, not direction.</li>
       <li><b>Bill tracking depends on a watchlist.</b> Congress.gov has no reliable full-text bill search in its API, so we follow a curated list. A relevant bill we have not listed is invisible until someone adds it.</li>
       <li><b>Some precedent figures are unverified.</b> Cumulative guaranteed-income dollars and recipients are maintainer figures; the pilot dashboard does not publish a total we could confirm. They are flagged in the data and on the card.</li>
-      <li><b>Polling is thin and dated.</b> National UBI polls are rare, question wording varies widely, and the latest one in the file comes from a right-leaning sponsor. One poll drives the whole public opinion sub-index.</li>
+      <li><b>Polling is thin.</b> National UBI polls are rare and question wording varies widely: "a monthly payment to every adult that would require significant government funding" and "a monthly stimulus check to every American" are not the same question. The average weights by sample size and recency, not by wording, and two of the current polls have partisan sponsors.</li>
+      <li><b>Proposal sizes are our arithmetic.</b> "5% of OpenAI" is converted to dollars at OpenAI's last disclosed valuation. A private valuation is a negotiated number, and the discounts by status are an editorial choice.</li>
       <li><b>Headcount comes from prose.</b> 10-Ks rarely tag employee counts in XBRL, so EDGAR headcount is parsed from the Human Capital paragraph. A reworded sentence can drop a company from the comparison, and headcount is global while the thesis is about US payroll.</li>
-      <li><b>Fiscal pressure cuts both ways.</b> High deficits can block new spending as easily as force it. We score deficits as pressure toward change; you may reasonably flip the sign.</li>
+      <li><b>Fiscal pressure cuts both ways.</b> High deficits can block new spending as easily as force it. We score deficits as pressure toward change, at a weight of 0.05 in v2; you may reasonably flip the sign.</li>
+      <li><b>GovTrack has been unreachable.</b> govtrack.us returned 502 for the whole site in October 2026. Its prognosis is unscored, so the index does not move, but the calibration card goes stale until it returns.</li>
       <li><b>Renormalizing over missing sub-indices hides gaps.</b> If a whole sub-index goes dark, the composite leans on what remains. <code>weightCovered</code> exposes this, but the headline number does not.</li>
       <li><b>Mixed cadences.</b> Inputs update daily, monthly and annually (the deficit is a fiscal-year figure). A daily snapshot is mostly yesterday's numbers.</li>
     </ul>

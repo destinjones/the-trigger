@@ -6,13 +6,11 @@
 import type { Snapshot } from '../../../scripts/lib/run.ts';
 import type { SourceResult } from '../../../sources/_types.ts';
 import { parseWeights } from '../../../index/model.ts';
-import weightsText from '../../../index/weights.v1.yaml?raw';
 import ledgerJson from '../../../predictions/ledger.json';
 
 export type { Snapshot };
 
 export const REPO_URL = (import.meta.env.REPO_URL as string | undefined) ?? 'https://github.com/destinjones/the-trigger';
-export const weights = parseWeights(weightsText);
 
 const files = import.meta.glob<Snapshot>('../../../data/*.json', { eager: true, import: 'default' });
 
@@ -26,6 +24,13 @@ if (snapshots.length === 0) throw new Error('No snapshots in data/. Run `pnpm sn
 
 export const latest = snapshots[snapshots.length - 1] as Snapshot;
 export const previous: Snapshot | null = snapshots.length > 1 ? (snapshots[snapshots.length - 2] as Snapshot) : null;
+
+/** The weights file the latest snapshot was scored with, so labels and groups match its numbers. */
+const weightFiles = import.meta.glob<string>('../../../index/weights.v*.yaml', { eager: true, query: '?raw', import: 'default' });
+const weightsText = Object.entries(weightFiles).find(([p]) => p.endsWith(`/weights.${latest.weightsVersion}.yaml`))?.[1];
+if (!weightsText) throw new Error(`No index/weights.${latest.weightsVersion}.yaml for the latest snapshot`);
+export const weights = parseWeights(weightsText);
+export const weightsPath = `index/weights.${latest.weightsVersion}.yaml`;
 
 export function snapshotUrl(s: Snapshot): string {
   return `${REPO_URL}/blob/main/data/${s.date}.json`;

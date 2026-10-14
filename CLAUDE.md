@@ -4,7 +4,7 @@ Open-source tracker of US readiness for an AI-funded citizen dividend. Read READ
 
 ## Commands
 - `pnpm test` (vitest), `pnpm typecheck`, `pnpm lint`, `pnpm build` (Astro, static, root `web/`)
-- `pnpm snapshot [-- --date D --replay FILE --record FILE --revise --dry-run --weights v1]`
+- `pnpm snapshot [-- --date D --replay FILE --record FILE --revise --dry-run --weights v2]`
 - `pnpm scorecard` regenerates SCOREBOARD.md from predictions/ledger.json
 
 ## Non-negotiables

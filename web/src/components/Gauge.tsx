@@ -1,4 +1,6 @@
-/** SVG semicircle arc, 0–100 readiness. Amber fill. */
+import { scoreColor } from '../lib/format.ts';
+
+/** SVG semicircle arc, 0–100 readiness, colored by value. */
 export interface GaugeProps {
   value: number;
   label?: string;
@@ -25,7 +27,7 @@ export default function Gauge({ value, label = 'Readiness' }: GaugeProps) {
   return (
     <svg class="gauge" viewBox="0 0 200 112" role="img" aria-label={`${label} ${value} of 100`}>
       <path d={arcPath(100)} fill="none" stroke="var(--border)" stroke-width="14" />
-      {value > 0 && <path d={arcPath(value)} fill="none" stroke="var(--amber)" stroke-width="14" />}
+      {value > 0 && <path d={arcPath(value)} fill="none" stroke={scoreColor(value)} stroke-width="14" />}
       {ticks.map((t) => {
         const [x, y] = point(t);
         const [xi, yi] = [CX + (x - CX) * 0.8, CY + (y - CY) * 0.8];

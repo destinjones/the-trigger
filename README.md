@@ -2,7 +2,7 @@
 
 **Live tracker:** https://destinjones.github.io/the-trigger · **Method and weaknesses:** [/method](https://destinjones.github.io/the-trigger/method) · **Our record:** [SCOREBOARD.md](SCOREBOARD.md)
 
-The Trigger tracks how close the United States is to paying its citizens a dividend because AI is displacing work. It boils six sub-indices (labor dislocation, political momentum, precedent, fiscal pressure, public opinion and corporate equity) into one 0–100 readiness score and a projected date for the first federal AI dividend, always shown with its band and confidence. The thesis is blunt: checks do not arrive from goodwill, they arrive when consumer spending breaks. So the tracker watches the dislocation and the political response side by side, and treats the gap between them as the story. Every number links to the upstream record it came from, the weighting is a YAML file you can fork, and every projection is logged and graded.
+**The layoffs started. The checks haven't.** The Trigger tracks how close the United States is to paying its citizens a dividend because AI is displacing work, and projects when the first federal check clears. It boils six sub-indices (labor dislocation, political momentum, public opinion, corporate equity, precedent and fiscal pressure) into one 0–100 readiness score and a projected date for the first federal AI dividend, always shown with its band and confidence. The thesis is blunt: checks do not arrive from goodwill, they arrive when consumer spending breaks. So the tracker watches the dislocation and the political response side by side, and treats the gap between them as the story. Every number links to the upstream record it came from, the weighting is a YAML file you can fork, and every projection is logged and graded.
 
 ![Screenshot of the tracker](docs/screenshot.png)
 
@@ -31,7 +31,7 @@ pnpm snapshot -- --date 2026-10-14 --replay fixtures/cassettes/2026-10-14.json -
 
 | Piece | Where |
 |---|---|
-| Weighting, with a comment on every line | [`index/weights.v1.yaml`](index/weights.v1.yaml) |
+| Weighting, with a comment on every line | [`index/weights.v2.yaml`](index/weights.v2.yaml) (default; [v1](index/weights.v1.yaml) still runs) |
 | Per-metric 0–100 transforms and their reasoning | [`index/normalize.ts`](index/normalize.ts) |
 | Composite and projection (pure, tested) | [`index/model.ts`](index/model.ts) |
 | One module per source, one interface | [`sources/`](sources) |
@@ -44,7 +44,7 @@ Design rules: git is the database (no backend, nothing fetched in the browser); 
 
 ## Argue with the index
 
-1. Copy `index/weights.v1.yaml` to `weights.v2.yaml` and change what you disagree with. Say why in the comments.
+1. Copy `index/weights.v2.yaml` to `weights.v3.yaml` and change what you disagree with. Say why in the comments.
 2. `pnpm snapshot -- --weights v2 --dry-run` to see your score and date.
 3. Open a pull request with the result.
 

@@ -55,6 +55,31 @@ code { font-family: var(--mono); font-size: 12px; color: var(--violet); }
 .grid { display: grid; gap: 12px; }
 section { margin: 12px 0; }
 
+/* Headline */
+.headline { margin: 32px 0 20px; }
+.headline h1 { font-size: 44px; line-height: 1.1; font-weight: 500; max-width: 900px; }
+.headline h1 span { color: var(--amber); display: block; }
+.lede { font-size: 16px; color: var(--muted); max-width: 680px; margin: 14px 0 0; }
+
+/* Contrast: the two numbers that carry the thesis */
+.contrast { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: stretch; gap: 12px; }
+.contrast-cell { display: flex; flex-direction: column; gap: 8px; padding: 20px; }
+.contrast-value { font-size: 64px; line-height: 1; font-weight: 500; }
+.contrast-label { font-size: 15px; color: var(--fg); }
+.contrast-cell .cite { margin-top: auto; }
+.contrast-vs { align-self: center; color: var(--muted); font-size: 13px; }
+
+/* Gap */
+.gap-row { display: flex; align-items: center; gap: 20px; }
+.gap-value { font-size: 36px; font-weight: 500; min-width: 110px; }
+.gap-head { font-size: 15px; font-weight: 500; margin-bottom: 4px; }
+.gap-row p { margin: 0; max-width: 720px; }
+.gap-row .spark { margin-left: auto; flex: none; }
+
+/* Grouped sub-indices */
+.groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+.groups .group-title { margin-top: 4px; }
+
 /* Hero */
 .hero { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 12px; margin-top: 12px; }
 .clock-label { font-size: 12px; color: var(--muted); }
@@ -144,8 +169,19 @@ section { margin: 12px 0; }
 footer.site { border-top: 1px solid var(--border); margin-top: 32px; padding: 16px 0 32px; font-size: 12px; color: var(--muted); }
 footer.site .wrap { display: flex; flex-wrap: wrap; gap: 8px 24px; }
 
+@media (max-width: 560px) {
+  .topbar .snap { display: none; }
+  .brand { white-space: nowrap; }
+}
+
 @media (max-width: 860px) {
   .hero, .two-col { grid-template-columns: minmax(0, 1fr); }
   .subindices { grid-template-columns: minmax(0, 1fr); }
+  .headline h1 { font-size: 32px; }
+  .contrast { grid-template-columns: minmax(0, 1fr); }
+  .contrast-vs { display: none; }
+  .contrast-value { font-size: 48px; }
+  .gap-row { flex-wrap: wrap; }
+  .gap-row .spark { margin-left: 0; }
   .countdown .v { font-size: 34px; }
 }

@@ -144,6 +144,14 @@ export const TRANSFORMS: Readonly<Record<string, Transform>> = {
     // Binding, dated commitments only. Proposals and op-eds score 0.
     note: '0 at $0, 100 at $100B of equity or cash committed by AI firms to a public fund.',
   },
+  'corporate.equity_pipeline_usd': {
+    kind: 'linear', at0: 0, at100: 25_000_000_000, unit: 'USD',
+    // Added in v2. Sum of proposed equity or cash for a public fund, each
+    // discounted by how firm it is: binding 1.0, signed 0.6, reported talks
+    // 0.3, floated 0.15. $25B (discounted) is reachable this decade; v1's
+    // $100B binding-only anchor was not.
+    note: '0 at $0, 100 at $25B of discounted equity pipeline (binding ×1.0, signed ×0.6, reported talks ×0.3, floated ×0.15).',
+  },
   'corporate.capex_headcount_gap_pp': {
     kind: 'linear', at0: 0, at100: 50, unit: 'pp',
     // Added beyond the v1 spec list. From SEC filings: YoY capex growth minus
@@ -153,6 +161,10 @@ export const TRANSFORMS: Readonly<Record<string, Transform>> = {
   },
 
   // ── Unscored, recorded for calibration ───────────────────────────────
+  'labor.ai_layoffs_ytd': {
+    kind: 'linear', at0: 0, at100: 500_000, unit: 'jobs',
+    note: 'Unscored. AI-attributed job cuts, calendar year to date. Display only; the scored figure is the trailing 12 months.',
+  },
   'markets.passage_probability': {
     kind: 'linear', at0: 0, at100: 100, unit: '%',
     note: 'Unscored. Prediction-market probability of a federal UBI/dividend, for calibration only.',

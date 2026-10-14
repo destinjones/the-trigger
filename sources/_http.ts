@@ -37,8 +37,13 @@ export function cassetteKey(method: string, url: string, body?: unknown): string
 
 export class HttpError extends Error {
   constructor(public status: number, public url: string, snippet: string) {
-    super(`HTTP ${status} for ${redact(url)}: ${snippet.slice(0, 200)}`);
+    super(`HTTP ${status} for ${redact(url)}: ${toPlain(snippet).slice(0, 160)}`);
   }
+}
+
+/** Error bodies are often HTML pages; keep only their text so messages stay readable. */
+function toPlain(body: string): string {
+  return body.replace(/<(script|style)[\s\S]*?<\/\1>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
 function redact(url: string): string {

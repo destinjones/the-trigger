@@ -13,6 +13,8 @@ import type { SourceResult } from '../sources/_types.ts';
 export interface SubIndexDef {
   weight: number;
   label: string;
+  /** Narrative role on the page: pressure, response or backdrop. */
+  group?: string;
 }
 
 export interface Weights {
@@ -39,7 +41,11 @@ export function parseWeights(yamlText: string): Weights {
     if (!def || typeof def.weight !== 'number' || def.weight < 0) {
       throw new Error(`weights: sub-index "${key}" needs a non-negative numeric weight`);
     }
-    subIndices[key] = { weight: def.weight, label: typeof def.label === 'string' ? def.label : key };
+    subIndices[key] = {
+      weight: def.weight,
+      label: typeof def.label === 'string' ? def.label : key,
+      ...(typeof def.group === 'string' ? { group: def.group } : {}),
+    };
     sum += def.weight;
   }
   if (Math.abs(sum - 1) > 0.001) throw new Error(`weights: sub-index weights sum to ${sum}, expected 1.0`);

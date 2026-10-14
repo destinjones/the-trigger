@@ -1,15 +1,27 @@
-# Corporate equity toward a public fund. Only binding, dated commitments count
-# toward corporate.equity_commitments_usd. Proposals go in `actors`.
+# Corporate equity or cash toward a US public fund. Every live proposal goes in
+# `commitments` with a status; sources/corporate.ts applies the discounts:
+#   binding 1.0   legally enforceable and dated
+#   signed 0.6    signed letter or term sheet, not yet enforceable
+#   reported 0.3  talks reported by named outlets
+#   floated 0.15  op-ed, interview, or proposal with no counterparty
+# valueUsd null = size unknown: listed, counts 0. Record how each value was
+# derived in `basis`.
 reviewedOn: 2026-10-14
 maxAgeDays: 120
-commitments: []   # none binding as of reviewedOn
-metrics:
-  - metricId: corporate.equity_commitments_usd
-    label: Binding AI equity committed to a public fund
-    value: 0
-    unit: USD
-    asOf: 2026-10-14
-    sourceName: TechCrunch, OpenAI 5% proposal (not binding)
+commitments:
+  - entity: OpenAI
+    what: 5% of OpenAI equity to a US sovereign wealth fund
+    status: floated
+    valueUsd: 42600000000
+    basis: "5% x $852B post-money valuation (OpenAI, round closed 2026-03-31; reaffirmed by Aug 2026 employee sale per CNBC)"
+    asOf: 2026-07-02
     sourceUrl: https://techcrunch.com/2026/07/02/openai-proposed-donating-5-of-its-equity-to-a-us-sovereign-wealth-fund/
-    verified: true
-    note: "$0 binding. Largest live proposal: 5% of OpenAI equity to a US sovereign wealth fund"
+    sourceName: TechCrunch / FT
+  - entity: White House
+    what: Federal equity stake in OpenAI
+    status: reported
+    valueUsd: null
+    basis: No size reported
+    asOf: 2026-06-05
+    sourceUrl: https://www.cnbc.com/2026/06/05/trump-open-ai-altman-stake.html
+    sourceName: CNBC
