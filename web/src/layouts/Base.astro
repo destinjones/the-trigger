@@ -5,7 +5,7 @@ import { REPO_URL, latest, weightsPath } from '../lib/data.ts';
 interface Props {
   title: string;
   description: string;
-  page: 'index' | 'method' | 'calculator' | 'log';
+  page: 'index' | 'method' | 'calculator' | 'log' | 'move';
 }
 const { title, description, page } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
@@ -49,6 +49,7 @@ const ogImage = `${site}${base}/og.png`;
         <nav>
           <a href={`${base}/`} aria-current={page === 'index' ? 'page' : undefined}>Tracker</a>
           <a href={`${base}/calculator`} aria-current={page === 'calculator' ? 'page' : undefined}>What you'd get</a>
+          <a href={`${base}/what-would-move-it`} aria-current={page === 'move' ? 'page' : undefined}>What would move it</a>
           <a href={`${base}/log`} aria-current={page === 'log' ? 'page' : undefined}>What moved</a>
           <a href={`${base}/method`} aria-current={page === 'method' ? 'page' : undefined}>Method</a>
           <a href={REPO_URL}>Source</a>

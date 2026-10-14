@@ -1,6 +1,6 @@
 <p align="center"><img src="docs/banner.svg" alt="The Trigger" width="100%"></p>
 
-**Live tracker:** https://destinjones.github.io/the-trigger · **Method and weaknesses:** [/method](https://destinjones.github.io/the-trigger/method) · **Our record:** [SCOREBOARD.md](SCOREBOARD.md)
+**Live tracker:** https://destinjones.github.io/the-trigger · **What you'd get:** [/calculator](https://destinjones.github.io/the-trigger/calculator) · **What moved:** [/log](https://destinjones.github.io/the-trigger/log) ([RSS](https://destinjones.github.io/the-trigger/rss.xml)) · **Method and weaknesses:** [/method](https://destinjones.github.io/the-trigger/method) · **Our record:** [SCOREBOARD.md](SCOREBOARD.md)
 
 **The layoffs started. The checks haven't.** The Trigger tracks how close the United States is to paying its citizens a dividend because AI is displacing work, and projects when the first federal check clears. It boils six sub-indices (labor dislocation, political momentum, public opinion, corporate equity, precedent and fiscal pressure) into one 0–100 readiness score and a projected date for the first federal AI dividend, always shown with its band and confidence. The thesis is blunt: checks do not arrive from goodwill, they arrive when consumer spending breaks. So the tracker watches the dislocation and the political response side by side, and treats the gap between them as the story. Every number links to the upstream record it came from, the weighting is a YAML file you can fork, and every projection is logged and graded.
 
@@ -49,6 +49,10 @@ Design rules: git is the database (no backend, nothing fetched in the browser); 
 3. Open a pull request with the result.
 
 Disagree with an anchor instead (say, 9% unemployment as "trigger pulled")? Edit `index/normalize.ts`; the tests tell you what moved.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md): fixing a curated value or adding a poll takes one YAML edit.
 
 ## Sources
 

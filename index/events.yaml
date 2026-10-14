@@ -1,0 +1,65 @@
+# Checkable events and the raw metric values each would change. The page at
+# /what-would-move-it rescores the latest snapshot with these changes applied
+# (index/scenarios.ts), so every "+N points" is computed, not asserted.
+# `set` replaces a raw value; `add` adds to it. Units are the metric's own
+# (see index/normalize.ts). `watch` is where anyone can check whether it happened.
+events:
+  - id: s4825-out-of-committee
+    event: S. 4825 is reported out of Senate Finance
+    group: response
+    changes: [{ metricId: politics.bills_with_committee_movement, add: 1 }]
+    watch: https://www.congress.gov/bill/119th-congress/senate-bill/4825/all-actions
+  - id: both-bills-move
+    event: Both watched federal bills get a hearing or markup
+    group: response
+    changes: [{ metricId: politics.bills_with_committee_movement, add: 2 }]
+    watch: https://github.com/destinjones/the-trigger/blob/main/sources/watchlist.yaml
+  - id: house-majority-cosponsors
+    event: The watched bills reach 218 co-sponsors between them
+    group: response
+    changes: [{ metricId: politics.cosponsors_total, set: 218 }]
+    watch: https://www.congress.gov/bill/119th-congress/house-bill/5830/cosponsors
+  - id: openai-signs
+    event: OpenAI signs its 5% equity pledge (floated to signed)
+    group: response
+    # 5% x $852B = $42.6B, moving from x0.15 to x0.6.
+    changes: [{ metricId: corporate.equity_pipeline_usd, add: 19170000000 }]
+    watch: https://github.com/destinjones/the-trigger/blob/main/sources/curated/corporate.yaml
+  - id: binding-25b
+    event: Any AI firm makes a binding $25B commitment to a public fund
+    group: response
+    changes: [{ metricId: corporate.equity_pipeline_usd, add: 25000000000 }]
+    watch: https://github.com/destinjones/the-trigger/blob/main/sources/curated/corporate.yaml
+  - id: polls-50
+    event: The national poll average reaches 50% support
+    group: response
+    changes: [{ metricId: opinion.ubi_support_pct, set: 50 }]
+    watch: https://github.com/destinjones/the-trigger/blob/main/sources/curated/polling.yaml
+  - id: three-more-permanent
+    event: Three more governments make guaranteed income permanent, as Cook County did
+    group: backdrop
+    changes: [{ metricId: precedent.permanent_programs, add: 3 }]
+    watch: https://github.com/destinjones/the-trigger/blob/main/sources/curated/pilots.yaml
+  - id: payrolls-negative
+    event: Payrolls shrink, averaging −50k a month over three months
+    group: pressure
+    changes: [{ metricId: labor.payrolls_3mo_avg_change, set: -50 }]
+    watch: https://data.bls.gov/timeseries/CES0000000001
+  - id: unemployment-55
+    event: Unemployment reaches 5.5%
+    group: pressure
+    changes: [{ metricId: labor.unemployment_rate, set: 5.5 }]
+    watch: https://data.bls.gov/timeseries/LNS14000000
+  - id: ai-cuts-300k
+    event: AI-attributed job cuts reach 300,000 over 12 months
+    group: pressure
+    changes: [{ metricId: labor.ai_layoffs_ttm, set: 300000 }]
+    watch: https://www.challengergray.com/blog/
+  - id: forcing-event
+    event: "The thesis's forcing event: 7% unemployment, payrolls −100k a month, 400,000 AI-attributed cuts"
+    group: pressure
+    changes:
+      - { metricId: labor.unemployment_rate, set: 7.0 }
+      - { metricId: labor.payrolls_3mo_avg_change, set: -100 }
+      - { metricId: labor.ai_layoffs_ttm, set: 400000 }
+    watch: https://data.bls.gov/timeseries/LNS14000000

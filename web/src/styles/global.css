@@ -97,6 +97,10 @@ section { margin: 12px 0; }
 .log-changes li { margin-bottom: 4px; }
 .log-changes .log-source { color: var(--red); }
 
+/* What would move it */
+.move-delta { color: var(--green); font-weight: 500; font-size: 16px; }
+.move-table td:first-child { max-width: 560px; }
+
 /* Embed */
 .embed { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
 .embed code { word-break: break-all; }

@@ -1,0 +1,68 @@
+---
+import Base from '../layouts/Base.astro';
+import SourceCite from '../components/SourceCite.tsx';
+import { parse } from 'yaml';
+import eventsText from '../../../index/events.yaml?raw';
+import { eventEffect, type MetricChange } from '../../../index/scenarios.ts';
+import { fileUrl, latest, metric, snapshotUrl, weights } from '../lib/data.ts';
+import { fmtNumber, scoreColor } from '../lib/format.ts';
+import { quarter, quarterOf } from '../lib/headline.ts';
+
+interface Ev { id: string; event: string; group: string; changes: MetricChange[]; watch: string }
+const { events } = parse(eventsText) as { events: Ev[] };
+const rows = events
+  .filter((e) => e.changes.every((c) => metric(latest, c.metricId)))
+  .map((e) => ({ ...e, effect: eventEffect(latest.metrics, weights, e.changes, latest.date, latest.sourceCoveragePct) }))
+  .sort((a, b) => b.effect.readinessDelta - a.effect.readinessDelta);
+const now = (c: MetricChange) => {
+  const m = metric(latest, c.metricId);
+  return m ? `${m.label ?? c.metricId}: ${fmtNumber(m.value, m.unit)} now` : c.metricId;
+};
+const GROUP: Record<string, string> = { pressure: 'pressure', response: 'response', backdrop: 'backdrop' };
+---
+<Base title="What would move it: The Trigger" description={`Readiness is ${latest.readiness.toFixed(1)}. These are the checkable events that would move it, and by how much, computed from the model.`} page="move">
+  <section class="headline">
+    <h1>What would have to happen. <span>Event by event.</span></h1>
+    <p class="lede">
+      Readiness is <span class="num">{latest.readiness.toFixed(1)}</span> and the first federal check is projected for {quarter}.
+      Each row below rescores today's snapshot as if one checkable thing happened, with everything else held still.
+      The model does the arithmetic; nothing here is a guess about likelihood.
+    </p>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Events, largest effect first</h2>
+      <SourceCite href={snapshotUrl(latest)} name={`snapshot ${latest.date} r${latest.revision}, weights ${latest.weightsVersion}`} />
+    </div>
+    <div class="table-wrap">
+      <table class="table move-table">
+        <thead><tr><th>If this happens</th><th>Readiness</th><th>First check</th><th>Where to check</th></tr></thead>
+        <tbody>
+          {rows.map((r) => (
+            <tr id={r.id}>
+              <td>
+                <div class="bill-title">{r.event}</div>
+                <div class="muted small">
+                  <span class="pill pill-muted">{GROUP[r.group] ?? r.group}</span>{' '}
+                  {r.changes.map(now).join('; ')}
+                </div>
+              </td>
+              <td class="num nowrap">
+                <span class="move-delta">+{r.effect.readinessDelta.toFixed(1)}</span>
+                <span class="muted"> → </span><span style={{ color: scoreColor(r.effect.readiness) }}>{r.effect.readiness.toFixed(1)}</span>
+              </td>
+              <td class="num nowrap">{r.effect.monthsEarlier > 0 ? `${r.effect.monthsEarlier} mo earlier` : 'no change'}<div class="muted small">{quarterOf(r.effect.projectedDate)}</div></td>
+              <td><SourceCite href={r.watch} name={new URL(r.watch).hostname.replace(/^www\./, '')} /></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <p class="small muted" style="margin-top:12px">
+      Events and the raw values they change: <a href={fileUrl('index/events.yaml')}>index/events.yaml</a>.
+      Arithmetic: <a href={fileUrl('index/scenarios.ts')}>index/scenarios.ts</a>, the same composite and projection the daily run uses.
+      Effects do not add exactly when events share a sub-index or a metric hits its 100 anchor. A signed OpenAI pledge and a binding $25B commitment score the same because either one alone takes the equity-pipeline metric past its $25B anchor.
+    </p>
+  </section>
+</Base>
