@@ -26,8 +26,12 @@ export interface Company {
   capex: string[];
 }
 
-// SEC's documented form is "Company Name AdminContact@domain": a name, then an email, nothing else.
-export const DEFAULT_SEC_USER_AGENT = 'TheTrigger 46937471+destinjones@users.noreply.github.com';
+// SEC's documented form is "Company Name AdminContact@domain". Set SEC_USER_AGENT to
+// that with a real inbox. Tested from a GitHub Actions runner on 2026-10-14:
+// data.sec.gov answers 403 to any agent carrying a users.noreply.github.com
+// address, and 200 to a plain name, so the default is the name alone rather
+// than an address SEC refuses.
+export const DEFAULT_SEC_USER_AGENT = 'TheTrigger';
 
 export const COMPANIES: Company[] = [
   { name: 'Microsoft', ticker: 'MSFT', cik: 789019, capex: ['PaymentsToAcquirePropertyPlantAndEquipment'] },
