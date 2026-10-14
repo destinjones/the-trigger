@@ -13,7 +13,7 @@ jobs:
       - name: curl with several agents
         run: |
           U=https://data.sec.gov/submissions/CIK0000789019.json
-          for ua in "TheTrigger 46937471+destinjones@users.noreply.github.com" "the-trigger github.com/destinjones/the-trigger 46937471+destinjones@users.noreply.github.com" "Sample Company Name AdminContact@samplecompany.com" "Mozilla/5.0"; do
+          for ua in "TheTrigger destinjones@users.noreply.github.com" "TheTrigger 46937471-destinjones@users.noreply.github.com" "The Trigger 46937471+destinjones@users.noreply.github.com" "TheTrigger admin@example.org" "TheTrigger a+b@example.org" "TheTrigger"; do
             code=$(curl -s -o /dev/null -w "%{http_code}" -H "User-Agent: $ua" -H "Accept-Encoding: gzip, deflate" "$U")
             echo "PROBE curl $code  [$ua]"
           done
