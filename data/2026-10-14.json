@@ -1,6 +1,6 @@
 {
   "date": "2026-10-14",
-  "revision": 3,
+  "revision": 4,
   "weightsVersion": "v2",
   "readiness": 28.1,
   "projectedDate": "2031-01-01",
@@ -335,7 +335,7 @@
   ],
   "filings": [],
   "sourceErrors": {
-    "govtrack": "HTTP 502 for https://www.govtrack.us/api/v2/bill?congress=119&bill_type=house_bill&number=5830: 502 Bad Gateway 502 Bad Gateway nginx/1.14.0 (Ubuntu)",
+    "govtrack": "fetch failed",
     "edgar": "EDGAR: no company with both capex and headcount. MSFT: capex unavailable (HTTP 403 for https://data.sec.gov/api/xbrl/companyconcept/CIK0000789019/us-gaap/PaymentsToAcquirePropertyPlantAndEquipment.json: SEC.gov | Your Request Originates from an Undeclared Automated Tool U.S. Securities and Exchange Commission Your Request Originates from an Undeclared Automated); GOOGL: capex unavailable (HTTP 403 for https://data.sec.gov/api/xbrl/companyconcept/CIK0001652044/us-gaap/PaymentsToAcquirePropertyPlantAndEquipment.json: SEC.gov | Your Request Originates from an Undeclared Automated Tool U.S. Securities and Exchange Commission Your Request Originates from an Undeclared Automated); AMZN: capex unavailable (HTTP 403 for https://data.sec.gov/api/xbrl/companyconcept/CIK0001018724/us-gaap/PaymentsToAcquirePropertyPlantAndEquipment.json: SEC.gov | Your Request Originates from an Undeclared Automated Tool U.S. Securities and Exchange Commission Your Request Originates from an Undeclared Automated); META: capex unavailable (HTTP 403 for https://data.sec.gov/api/xbrl/companyconcept/CIK0001326801/us-gaap/PaymentsToAcquirePropertyPlantAndEquipment.json: SEC.gov | Your Request Originates from an Undeclared Automated Tool U.S. Securities and Exchange Commission Your Request Originates from an Undeclared Automated); ORCL: capex unavailable (HTTP 403 for https://data.sec.gov/api/xbrl/companyconcept/CIK0001341439/us-gaap/PaymentsToAcquirePropertyPlantAndEquipment.json: SEC.gov | Your Request Originates from an Undeclared Automated Tool U.S. Securities and Exchange Commission Your Request Originates from an Undeclared Automated); NVDA: capex unavailable (HTTP 403 for https://data.sec.gov/api/xbrl/companyconcept/CIK0001045810/us-gaap/PaymentsToAcquireProductiveAssets.json: SEC.gov | Your Request Originates from an Undeclared Automated Tool U.S. Securities and Exchange Commission Your Request Originates from an Undeclared Automated)"
   },
   "sourcesSkipped": [
