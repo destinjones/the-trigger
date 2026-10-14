@@ -1,20 +1,20 @@
 {
   "date": "2026-10-14",
-  "revision": 2,
-  "weightsVersion": "v1",
-  "readiness": 25.7,
-  "projectedDate": "2031-03-12",
-  "confidence": 0.54,
+  "revision": 3,
+  "weightsVersion": "v2",
+  "readiness": 28.1,
+  "projectedDate": "2031-01-01",
+  "confidence": 0.55,
   "bandMonths": 22,
   "sourceCoveragePct": 81.8,
   "weightCovered": 1,
   "subIndices": {
     "labor_dislocation": 18.8,
     "political_momentum": 28.3,
+    "public_opinion": 16,
+    "corporate_equity": 25.6,
     "precedent": 56.6,
-    "fiscal_pressure": 41,
-    "public_opinion": 4.4,
-    "corporate_equity": 0
+    "fiscal_pressure": 41
   },
   "metrics": [
     {
@@ -22,11 +22,23 @@
       "label": "Binding AI equity committed to a public fund",
       "value": 0,
       "unit": "USD",
-      "asOf": "2026-10-14",
-      "sourceName": "TechCrunch, OpenAI 5% proposal (not binding)",
-      "sourceUrl": "https://techcrunch.com/2026/07/02/openai-proposed-donating-5-of-its-equity-to-a-us-sovereign-wealth-fund/",
-      "note": "$0 binding. Largest live proposal: 5% of OpenAI equity to a US sovereign wealth fund",
+      "asOf": "2026-07-02",
       "fetchedAt": "2026-10-14T00:00:00Z",
+      "sourceName": "TechCrunch / FT",
+      "sourceUrl": "https://techcrunch.com/2026/07/02/openai-proposed-donating-5-of-its-equity-to-a-us-sovereign-wealth-fund/",
+      "note": "$0 binding. 2 proposals tracked, none enforceable",
+      "sourceId": "corporate"
+    },
+    {
+      "metricId": "corporate.equity_pipeline_usd",
+      "label": "AI equity pipeline, discounted",
+      "value": 6390000000,
+      "unit": "USD",
+      "asOf": "2026-07-02",
+      "fetchedAt": "2026-10-14T00:00:00Z",
+      "sourceName": "TechCrunch / FT",
+      "sourceUrl": "https://techcrunch.com/2026/07/02/openai-proposed-donating-5-of-its-equity-to-a-us-sovereign-wealth-fund/",
+      "note": "OpenAI: floated, $43B × 0.15; White House: reported, unsized",
       "sourceId": "corporate"
     },
     {
@@ -62,6 +74,18 @@
       "sourceName": "Challenger, Gray & Christmas, Sept 2026 report",
       "sourceUrl": "https://www.challengergray.com/blog/job-cuts-fall-in-september-hiring-plans-up-3-over-2025-on-weak-early-seasonal-hiring/",
       "note": "Derived: 120,136 cut YTD 2026 (21% of all cuts) plus Oct–Dec 2025",
+      "fetchedAt": "2026-10-14T00:00:00Z",
+      "sourceId": "challenger"
+    },
+    {
+      "metricId": "labor.ai_layoffs_ytd",
+      "label": "AI-attributed job cuts, 2026 to date",
+      "value": 120136,
+      "unit": "jobs",
+      "asOf": "2026-09-30",
+      "sourceName": "Challenger, Gray & Christmas, Sept 2026 report",
+      "sourceUrl": "https://www.challengergray.com/blog/job-cuts-fall-in-september-hiring-plans-up-3-over-2025-on-weak-early-seasonal-hiring/",
+      "note": "Jan–Sep 2026, employer cited AI. 21% of all announced cuts. Unscored: the trailing-12-month figure is the scored one",
       "fetchedAt": "2026-10-14T00:00:00Z",
       "sourceId": "challenger"
     },
@@ -104,7 +128,7 @@
     {
       "metricId": "markets.passage_probability",
       "label": "Market odds of federal household checks",
-      "value": 3.25,
+      "value": 3.2,
       "unit": "%",
       "asOf": "2026-10-14",
       "fetchedAt": "2026-10-14T00:00:00Z",
@@ -115,14 +139,14 @@
     },
     {
       "metricId": "opinion.ubi_support_pct",
-      "label": "Support for a universal basic income",
-      "value": 32,
+      "label": "Support for a basic income, poll average",
+      "value": 37.2,
       "unit": "%",
       "asOf": "2026-07-06",
-      "sourceName": "Manhattan Institute national survey, n=1,121",
-      "sourceUrl": "https://manhattan.institute/article/american-attitudes-on-welfare-waste-crime-and-the-political-environment",
-      "note": "32% support, 50% oppose a monthly payment to every adult. Fielded Jul 1–6, 2026; right-leaning sponsor",
       "fetchedAt": "2026-10-14T00:00:00Z",
+      "sourceName": "Weighted mean of 3 national polls",
+      "sourceUrl": "https://apnorc.org/projects/many-believe-poverty-and-homelessness-are-increasing-and-feel-the-government-has-a-responsibility-to-address-the-issues/",
+      "note": "AP-NORC 23%, Manhattan Institute 32% (right), Data for Progress 59% (left). Partisan sponsors at half weight",
       "sourceId": "polling"
     },
     {
@@ -311,8 +335,8 @@
   ],
   "filings": [],
   "sourceErrors": {
-    "govtrack": "HTTP 502 for https://www.govtrack.us/api/v2/bill?congress=119&bill_type=house_bill&number=5830: <html>\r\n<head><title>502 Bad Gateway</title></head>\r\n<body bgcolor=\"white\">\r\n<center><h1>502 Bad Gateway</h1></center>\r\n<hr><center>nginx/1.14.0 (Ubuntu)</center>\r\n</body>\r\n</html>\r\n",
-    "edgar": "EDGAR: no company with both capex and headcount. MSFT: capex unavailable (HTTP 403 for https://data.sec.gov/api/xbrl/companyconcept/CIK0000789019/us-gaap/PaymentsToAcquirePropertyPlantAndEquipment.json: <!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-equiv=\"Content-T); GOOGL: capex unavailable (HTTP 403 for https://data.sec.gov/api/xbrl/companyconcept/CIK0001652044/us-gaap/PaymentsToAcquirePropertyPlantAndEquipment.json: <!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-equiv=\"Content-T); AMZN: capex unavailable (HTTP 403 for https://data.sec.gov/api/xbrl/companyconcept/CIK0001018724/us-gaap/PaymentsToAcquirePropertyPlantAndEquipment.json: <!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-equiv=\"Content-T); META: capex unavailable (HTTP 403 for https://data.sec.gov/api/xbrl/companyconcept/CIK0001326801/us-gaap/PaymentsToAcquirePropertyPlantAndEquipment.json: <!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-equiv=\"Content-T); ORCL: capex unavailable (HTTP 403 for https://data.sec.gov/api/xbrl/companyconcept/CIK0001341439/us-gaap/PaymentsToAcquirePropertyPlantAndEquipment.json: <!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-equiv=\"Content-T); NVDA: capex unavailable (HTTP 403 for https://data.sec.gov/api/xbrl/companyconcept/CIK0001045810/us-gaap/PaymentsToAcquireProductiveAssets.json: <!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n<meta http-equiv=\"Content-T)"
+    "govtrack": "HTTP 502 for https://www.govtrack.us/api/v2/bill?congress=119&bill_type=house_bill&number=5830: 502 Bad Gateway 502 Bad Gateway nginx/1.14.0 (Ubuntu)",
+    "edgar": "EDGAR: no company with both capex and headcount. MSFT: capex unavailable (HTTP 403 for https://data.sec.gov/api/xbrl/companyconcept/CIK0000789019/us-gaap/PaymentsToAcquirePropertyPlantAndEquipment.json: SEC.gov | Your Request Originates from an Undeclared Automated Tool U.S. Securities and Exchange Commission Your Request Originates from an Undeclared Automated); GOOGL: capex unavailable (HTTP 403 for https://data.sec.gov/api/xbrl/companyconcept/CIK0001652044/us-gaap/PaymentsToAcquirePropertyPlantAndEquipment.json: SEC.gov | Your Request Originates from an Undeclared Automated Tool U.S. Securities and Exchange Commission Your Request Originates from an Undeclared Automated); AMZN: capex unavailable (HTTP 403 for https://data.sec.gov/api/xbrl/companyconcept/CIK0001018724/us-gaap/PaymentsToAcquirePropertyPlantAndEquipment.json: SEC.gov | Your Request Originates from an Undeclared Automated Tool U.S. Securities and Exchange Commission Your Request Originates from an Undeclared Automated); META: capex unavailable (HTTP 403 for https://data.sec.gov/api/xbrl/companyconcept/CIK0001326801/us-gaap/PaymentsToAcquirePropertyPlantAndEquipment.json: SEC.gov | Your Request Originates from an Undeclared Automated Tool U.S. Securities and Exchange Commission Your Request Originates from an Undeclared Automated); ORCL: capex unavailable (HTTP 403 for https://data.sec.gov/api/xbrl/companyconcept/CIK0001341439/us-gaap/PaymentsToAcquirePropertyPlantAndEquipment.json: SEC.gov | Your Request Originates from an Undeclared Automated Tool U.S. Securities and Exchange Commission Your Request Originates from an Undeclared Automated); NVDA: capex unavailable (HTTP 403 for https://data.sec.gov/api/xbrl/companyconcept/CIK0001045810/us-gaap/PaymentsToAcquireProductiveAssets.json: SEC.gov | Your Request Originates from an Undeclared Automated Tool U.S. Securities and Exchange Commission Your Request Originates from an Undeclared Automated)"
   },
   "sourcesSkipped": [
     "legiscan"
