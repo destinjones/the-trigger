@@ -6,6 +6,16 @@ on:
   schedule:
     # 14:15 UTC = 10:15 ET, after BLS 8:30 ET releases and Federal Register publication.
     - cron: '15 14 * * *'
+  # Rescore today when the model, a source, or a curated file changes, so the
+  # site never shows numbers computed by code that is no longer on main.
+  # Pushes made by this job use GITHUB_TOKEN and do not retrigger it.
+  push:
+    branches: [main]
+    paths:
+      - 'index/**'
+      - 'sources/**'
+      - 'scripts/snapshot.ts'
+      - 'scripts/lib/**'
   workflow_dispatch:
     inputs:
       date:
