@@ -6,11 +6,11 @@ export interface SparklineProps {
   color?: string;
 }
 
-export default function Sparkline({ points, width = 96, height = 24, color = 'var(--cyan)' }: SparklineProps) {
+export default function Sparkline({ points, width = 96, height = 24, color = 'var(--cyn)' }: SparklineProps) {
   if (points.length < 2) {
     return (
       <svg class="spark" width={width} height={height} viewBox={`0 0 ${width} ${height}`} aria-label="Not enough history yet">
-        <line x1="0" y1={height / 2} x2={width} y2={height / 2} stroke="var(--border)" stroke-dasharray="2 3" />
+        <line x1="0" y1={height / 2} x2={width} y2={height / 2} stroke="var(--bd)" stroke-dasharray="2 3" />
         {points.length === 1 && <circle cx={width - 2} cy={height / 2} r="2" fill={color} />}
       </svg>
     );

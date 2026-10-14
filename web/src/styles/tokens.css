@@ -1,0 +1,20 @@
+/* The Trigger design tokens. Every color and size on the site comes from here.
+   Type scale is bimodal on purpose: labels at 9.5-10px, data at 22-62px, almost
+   nothing between 14 and 22. Amber is the only brand accent; red, amber, cyan and
+   green otherwise encode VALUE (see index/color.ts), never identity. */
+:root {
+  --bg: #06080b; --pnl: #0b0f15; --bd: #182030; --grid: #111720;
+  --fg: #f4f7fb; --mut: #71829a; --dim: #3a4757;
+  --amb: #ffb020;  /* brand accent; also readiness 25-45 */
+  --red: #ff4a4a;  /* readiness < 25 */
+  --cyn: #38d2f2;  /* readiness < 65 */
+  --grn: #3ddc84;  /* readiness >= 65 */
+  --f-mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+  --f-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+  --t-label: 9.5px; --t-micro: 10px; --t-body: 12.5px; --t-lead: 14px;
+  --t-state: 22px; --t-stat: 31px; --t-h1: 40px; --t-hero: 62px;
+  --ls-label: .17em;
+  color-scheme: dark;
+}
+.lbl { font-family: var(--f-mono); font-size: var(--t-label); color: var(--dim); letter-spacing: var(--ls-label); text-transform: uppercase; }
+.num { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }

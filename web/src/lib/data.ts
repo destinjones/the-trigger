@@ -65,3 +65,13 @@ export interface Prediction {
   weightsVersion?: string;
 }
 export const ledger = ledgerJson as { predictions: Prediction[] };
+
+/** Monthly AI-attributed cuts from the curated Challenger file, for the gap chart. */
+import challengerText from '../../../sources/curated/challenger.yaml?raw';
+import { parse as parseYaml } from 'yaml';
+import type { MonthlyCuts } from './gap.ts';
+export const challengerMonthly: MonthlyCuts[] = ((parseYaml(challengerText) as { monthly?: MonthlyCuts[] }).monthly ?? []);
+export const billsObserved = snapshots.flatMap((s) => {
+  const m = s.metrics.find((x) => x.metricId === 'politics.bills_with_committee_movement');
+  return m ? [{ date: s.date, bills: m.value }] : [];
+});

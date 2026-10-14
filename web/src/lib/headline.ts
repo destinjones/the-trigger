@@ -26,12 +26,12 @@ export const movedLabel = 'federal dividend bills out of committee';
 export const year = latest.projectedDate.slice(0, 4);
 export const quarter = quarterOf(latest.projectedDate);
 
-export const title = "The Trigger: the layoffs started, the checks haven't";
+export const title = "The Trigger — the layoffs started, the checks haven't.";
 
 export const description = [
   cuts ? `AI has cut ${cuts.value.toLocaleString('en-US')} US jobs${cutsYtd ? ` in ${cutsYtd.asOf.slice(0, 4)}` : ' in a year'}.` : '',
   moved ? `${moved.value === 0 ? 'Zero' : moved.value} federal bills have left committee.` : '',
-  `The Trigger projects when the first federal dividend check clears: ${year}, ±${latest.bandMonths} months.`,
+  `The Trigger projects when the first dividend check actually clears — ${year}, ±${latest.bandMonths} months.`,
 ].filter(Boolean).join(' ');
 
 /** Sign of labor dislocation minus political momentum, with copy for each case. */

@@ -43,6 +43,8 @@ jobs:
           BASE_PATH: /${{ github.event.repository.name }}
           REPO_URL: ${{ github.server_url }}/${{ github.repository }}
         run: pnpm build
+      - name: Every page shows the newest snapshot
+        run: pnpm check-site
       - uses: actions/upload-pages-artifact@v3
         with:
           path: web/dist

@@ -21,6 +21,7 @@ const ogImage = `${site}${base}/og.png`;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <meta name="trigger:snapshot" content={`${latest.date} r${latest.revision} ${latest.readiness}`} />
     <link rel="canonical" href={pageUrl} />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="The Trigger" />
@@ -45,7 +46,7 @@ const ogImage = `${site}${base}/og.png`;
     <header class="topbar">
       <div class="wrap">
         <a class="brand" href={`${base}/`}>THE TRIGGER<span>_</span></a>
-        <span class="muted mono snap">snapshot {latest.date} r{latest.revision}</span>
+        <span class="snap">snapshot {latest.date} r{latest.revision}</span>
         <nav>
           <a href={`${base}/`} aria-current={page === 'index' ? 'page' : undefined}>Tracker</a>
           <a href={`${base}/calculator`} aria-current={page === 'calculator' ? 'page' : undefined}>What you'd get</a>
@@ -56,6 +57,7 @@ const ogImage = `${site}${base}/og.png`;
         </nav>
       </div>
     </header>
+    <slot name="wire" />
     <main class="wrap">
       <slot />
     </main>

@@ -1,0 +1,72 @@
+---
+/**
+ * One object for score, date, and time: the outer arc is readiness, the inner
+ * scale is 2026–2035 with a marker for today (amber, crawls live) and one for
+ * the projected first check (cyan). Never shows the date without its band.
+ */
+import SourceCite from './SourceCite.tsx';
+import { ARC, CIRC, DIAL, dialGeometry, polar, yearAngle, yearFraction } from '../lib/dial.ts';
+import { fmtDate } from '../lib/format.ts';
+import { quarterOf } from '../lib/headline.ts';
+
+interface Props {
+  readiness: number;
+  projectedDate: string;
+  bandMonths: number;
+  confidence: number;
+  asOf: string;
+  citeHref: string;
+  methodHref: string;
+}
+const { readiness, projectedDate, bandMonths, confidence, asOf, citeHref, methodHref } = Astro.props;
+const g = dialGeometry(readiness);
+const { cx, cy, r } = DIAL;
+const [tx1, ty1] = polar(yearAngle(yearFraction(projectedDate)), 124);
+const [tx2, ty2] = polar(yearAngle(yearFraction(projectedDate)), 134);
+const nowAngle = yearAngle(yearFraction(asOf));
+const days = Math.round((Date.parse(`${projectedDate}T00:00:00Z`) - Date.parse(`${asOf}T00:00:00Z`)) / 86_400_000);
+---
+<div class="dial-panel">
+  <svg class="dial" viewBox="0 0 340 340" role="img"
+       aria-label={`Readiness ${readiness.toFixed(1)} of 100. First federal check projected ${projectedDate}, plus or minus ${bandMonths} months.`}>
+    {g.ticks.map((t) => <line class={`dial-tick${t.major ? ' major' : ''}`} x1={t.x1.toFixed(1)} y1={t.y1.toFixed(1)} x2={t.x2.toFixed(1)} y2={t.y2.toFixed(1)} />)}
+    <circle class="dial-track" cx={cx} cy={cy} r={r} transform={`rotate(135 ${cx} ${cy})`}
+            stroke-dasharray={`${ARC.toFixed(1)} ${CIRC.toFixed(1)}`} />
+    <circle class="dial-prog" cx={cx} cy={cy} r={r} transform={`rotate(135 ${cx} ${cy})`}
+            stroke-dasharray={`${ARC.toFixed(1)} ${CIRC.toFixed(1)}`} stroke-dashoffset={g.offset.toFixed(1)}
+            style={`--arc:${ARC.toFixed(1)}`} />
+    <g class="dial-dot-g" style={`--to:${g.dotAngle.toFixed(2)}deg`}><circle class="dial-dot" cx={cx + r} cy={cy} r="5.5" /></g>
+
+    {g.years.map((y) => <text class={`dial-year${y.year < Number(asOf.slice(0, 4)) ? ' past' : ''}`} x={y.x.toFixed(1)} y={(y.y + 3).toFixed(1)} text-anchor="middle">{y.label}</text>)}
+    <line class="dial-target" x1={tx1.toFixed(1)} y1={ty1.toFixed(1)} x2={tx2.toFixed(1)} y2={ty2.toFixed(1)} />
+    <g id="dial-now" style={`transform-box:view-box;transform-origin:${cx}px ${cy}px;transform:rotate(${nowAngle.toFixed(3)}deg)`}>
+      <circle class="dial-now" cx={cx + 129} cy={cy} r="2.6" />
+    </g>
+
+    <text class="dial-value" x={cx} y={cy + 14} text-anchor="middle">{readiness.toFixed(1)}</text>
+    <text class="dial-label" x={cx} y={cy + 38} text-anchor="middle">READINESS / 100</text>
+  </svg>
+  <div class="lbl">Projected first federal check</div>
+  <div class="dial-date num">{fmtDate(projectedDate)}</div>
+  <div class="dial-meta">
+    ±<b>{bandMonths}</b> mo band · <b>{Math.round(confidence * 100)}%</b> confidence · {quarterOf(projectedDate)} ·{' '}
+    <span id="dial-days" data-target={projectedDate}>{days.toLocaleString('en-US')}</span> days
+  </div>
+  <div class="dial-cite"><SourceCite href={citeHref} name={`snapshot ${asOf}`} /> · <a class="small" href={methodHref}>how this is computed</a></div>
+</div>
+
+<script>
+  import { yearAngle, yearFraction } from '../lib/dial.ts';
+  // Today's marker on the year scale and the day count: the only parts of the
+  // dial that depend on the reader's clock. The score itself never does.
+  function tick() {
+    const now = new Date().toISOString().slice(0, 10);
+    const g = document.getElementById('dial-now');
+    if (g) g.style.transform = `rotate(${yearAngle(yearFraction(now)).toFixed(3)}deg)`;
+    const d = document.getElementById('dial-days');
+    const target = d?.dataset.target;
+    if (d && target) d.textContent = Math.max(0, Math.round((Date.parse(`${target}T00:00:00Z`) - Date.now()) / 86_400_000)).toLocaleString('en-US');
+  }
+  tick();
+  setInterval(tick, 60_000);
+</script>

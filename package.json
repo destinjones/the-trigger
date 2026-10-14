@@ -18,6 +18,7 @@
     "scorecard": "tsx scripts/scorecard.ts",
     "dev": "astro dev --root web",
     "build": "astro build --root web",
+    "check-site": "tsx scripts/check-site.ts",
     "preview": "astro preview --root web"
   },
   "devDependencies": {

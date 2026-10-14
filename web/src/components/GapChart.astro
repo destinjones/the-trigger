@@ -1,0 +1,36 @@
+---
+/**
+ * The thesis as a picture: AI-attributed job cuts climbing, bills past
+ * committee flat on the floor, the gap between them shaded. Drawn from
+ * sources/curated/challenger.yaml and data/*.json at build time.
+ */
+import { gapGeometry, type GapPoint } from '../lib/gap.ts';
+
+interface Props { pts: GapPoint[]; W?: number; H?: number }
+const { pts, W = 656, H = 200 } = Astro.props;
+const g = gapGeometry(pts, W, H);
+const last = pts.at(-1);
+---
+{g && last ? (
+  <svg class="gapchart" viewBox={`0 -8 ${W + 4} ${H + 16}`} role="img"
+       aria-label={`AI-attributed job cuts rose to ${last.cuts.toLocaleString('en-US')} while ${last.bills} federal dividend bills moved past committee`}>
+    <defs>
+      <linearGradient id="gapgrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="var(--red)" stop-opacity=".32" />
+        <stop offset="1" stop-color="var(--red)" stop-opacity="0" />
+      </linearGradient>
+    </defs>
+    <line class="gap-axis" x1="0" y1={H - 24} x2={W} y2={H - 24} />
+    {g.years.map((y) => <>{y.anchor === 'middle' && <line class="gap-axis" x1={y.x} y1={H - 24} x2={y.x} y2={H - 20} />}<text class="gap-year" x={y.x} y={H - 6} text-anchor={y.anchor}>{y.label}</text></>)}
+    <path class="gap-fill" d={g.gapPath} fill="url(#gapgrad)" />
+    <path class="gap-bills" d={g.billsPath} />
+    <path class="gap-cuts" d={g.cutsPath} style={`stroke-dasharray:${g.cutsLength.toFixed(1)};--len:${g.cutsLength.toFixed(1)}`} />
+    <text class="gap-end cuts" x={g.end.x - 6} y={g.end.cutsY - 10} text-anchor="end">AI-attributed job cuts · {last.cuts.toLocaleString('en-US')}</text>
+    <text class="gap-end bills" x={g.end.x - 6} y={g.end.billsY - 8} text-anchor="end">bills past committee · {last.bills}</text>
+  </svg>
+) : (
+  <svg class="gapchart" viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Not enough history yet">
+    <line class="gap-bills empty" x1="0" y1={H / 2} x2={W} y2={H / 2} />
+    <text class="gap-empty" x={W / 2} y={H / 2 - 10} text-anchor="middle">not enough history yet</text>
+  </svg>
+)}

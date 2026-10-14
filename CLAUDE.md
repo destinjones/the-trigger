@@ -21,7 +21,7 @@ Open-source tracker of US readiness for an AI-funded citizen dividend. Read READ
 - `sources/` one module per source implementing `Source` from `_types.ts`; register in `sources/index.ts`. Use `ctx.http` (never global fetch) so runs can be recorded/replayed, and `ctx.today` (never the clock).
 - `sources/curated/*.yaml` hand-maintained values with deep links; fail when `reviewedOn` is older than `maxAgeDays`.
 - `scripts/lib/run.ts` runner: isolates failures, carries last values forward with `stale: true`.
-- `web/` Astro + Preact components. Only `Clock` and `Calculator` hydrate (`client:load`); both render complete HTML at build time first.
+- `web/` Astro + Preact components. Only `Calculator` hydrates (`client:load`). The dial's today-marker, the YTD counters, and the wire are small inline scripts over complete build-time HTML. `pnpm check-site` (after build) fails if any page renders a different snapshot than the newest data file.
 - `fixtures/cassettes/` recorded upstream responses for tests.
 
 ## Adding a source
@@ -31,4 +31,4 @@ Open-source tracker of US readiness for an AI-funded citizen dividend. Read READ
 4. Add its terms to DATA_LICENSE.md.
 
 ## Design tokens
-bg #0e1117, panel #151a23, border #242b38, fg #e6e9ef, muted #7b8798, green #2fd47a, red #ff5c5c, amber #f5b544, cyan #3dd6f5, violet #a78bfa. Weights 400/500 only, min 11px, no gradients or shadows, mono tabular numerals for figures.
+All in `web/src/styles/tokens.css`; never hardcode a colour or size. bg #06080b, pnl #0b0f15, bd #182030, grid #111720, fg #f4f7fb, mut #71829a, dim #3a4757, amb #ffb020 (the only brand accent), red #ff4a4a, cyn #38d2f2, grn #3ddc84. Readiness colour comes from `index/color.ts` only. Bimodal type scale: 9.5/10/12.5/14 for labels and body, 22/31/40/62 for figures. Weights 400/500 only, no shadows; the one gradient is the gap fill. Mono tabular numerals for figures. Motion only on data, once on load, frozen under prefers-reduced-motion.

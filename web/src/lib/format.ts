@@ -44,16 +44,8 @@ export function fmtMonth(iso: string): string {
   return `${MONTHS[m - 1]} ${y}`;
 }
 
-/**
- * Color token for a 0–100 score, by how far along it is: red has barely
- * started, amber is underway, green is close to the trigger.
- */
-export function scoreColor(v: number | null): string {
-  if (v === null) return 'var(--muted)';
-  if (v < 25) return 'var(--red)';
-  if (v < 50) return 'var(--amber)';
-  return 'var(--green)';
-}
+/** Color token for a 0–100 score. One mapping for the whole site: see index/color.ts. */
+export { readinessColor as scoreColor } from '../../../index/color.ts';
 
 /** A bill with no recorded action for this long is shown as dead. */
 export const DEAD_AFTER_DAYS = 180;

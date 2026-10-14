@@ -27,3 +27,25 @@ metrics:
     sourceUrl: https://www.challengergray.com/blog/job-cuts-fall-in-september-hiring-plans-up-3-over-2025-on-weak-early-seasonal-hiring/
     verified: true
     note: "Jan–Sep 2026, employer cited AI. 21% of all announced cuts. Unscored: the trailing-12-month figure is the scored one"
+
+# Monthly AI-attributed cuts, from each Challenger report. Drives the gap chart on
+# the tracker (web/src/lib/gap.ts). ytd is the report's year-to-date figure; aiCuts
+# is the month, where the report states it. Jan-May 2025 are not yet recorded; the
+# June 2025 report puts Jan-Jun 2025 at 75 combined. 2025-07 is ytd(Jul) - ytd(Jun).
+monthly:
+  - { month: '2025-06', aiCuts: null, ytd: 75, url: https://www.challengergray.com/blog/june-2025-companies-announce-virtually-the-same-number-of-cuts-as-last-year-highest-q2-ytd-cuts-since-2020/ }
+  - { month: '2025-07', aiCuts: 10300, ytd: 10375, url: https://www.challengergray.com/blog/summer-lull-ends-july-job-cuts-spike-tech-ai-tariffs-blamed/ } # derived: 10,375 - 75
+  - { month: '2025-08', aiCuts: 0, ytd: 10375, url: https://www.challengergray.com/blog/pharma-and-finance-lead-as-august-2025-job-cuts-rise-39-to-85979/ }
+  - { month: '2025-09', aiCuts: 7000, ytd: 17375, url: https://www.challengergray.com/blog/september-job-cuts-fall-37-from-august-ytd-total-highest-since-2020-lowest-ytd-hiring-since-2009/ }
+  - { month: '2025-10', aiCuts: 31039, ytd: 48414, url: https://www.challengergray.com/blog/october-challenger-report-153074-job-cuts-on-cost-cutting-ai/ }
+  - { month: '2025-11', aiCuts: 6280, ytd: 54694, url: https://www.challengergray.com/blog/challenger-report-71321-job-cuts-on-restructurings-closings-economy/ }
+  - { month: '2025-12', aiCuts: 142, ytd: 54836, url: https://www.challengergray.com/wp-content/uploads/2026/01/Challenger-Report-December-2025.pdf }
+  - { month: '2026-01', aiCuts: 7624, ytd: 7624, url: https://www.challengergray.com/wp-content/uploads/2026/02/CR126007123.pdf }
+  - { month: '2026-02', aiCuts: 4680, ytd: 12304, url: https://www.challengergray.com/blog/challenger-report-march-cuts-rise-25-from-february-ai-leads-reasons/ } # read from the March 2026 report
+  - { month: '2026-03', aiCuts: 15341, ytd: 27645, url: https://www.challengergray.com/blog/challenger-report-march-cuts-rise-25-from-february-ai-leads-reasons/ }
+  - { month: '2026-04', aiCuts: 21490, ytd: 49135, url: https://www.challengergray.com/wp-content/uploads/2026/05/Challenger-Report-Apr2026001249.pdf }
+  - { month: '2026-05', aiCuts: 38579, ytd: 87714, url: https://www.challengergray.com/wp-content/uploads/2026/06/Challenger-Report-May-2026.pdf }
+  - { month: '2026-06', aiCuts: 14029, ytd: 101743, url: https://www.challengergray.com/blog/challenger-report-june-layoffs-cool-to-45849-down-53-from-may-ai-leads-reasons-for-fourth-consecutive-month/ }
+  - { month: '2026-07', aiCuts: 10970, ytd: 112713, url: https://www.challengergray.com/blog/challenger-report-layoffs-fall-hiring-picks-up-ai-leads-for-fifth-straight-month/ }
+  - { month: '2026-08', aiCuts: 3462, ytd: 116175, url: https://www.challengergray.com/blog/challenger-report-august-job-cuts-up-58-consumer-products-food-lead/ }
+  - { month: '2026-09', aiCuts: 3961, ytd: 120136, url: https://www.challengergray.com/blog/job-cuts-fall-in-september-hiring-plans-up-3-over-2025-on-weak-early-seasonal-hiring/ }

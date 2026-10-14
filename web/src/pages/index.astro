@@ -1,14 +1,16 @@
 ---
 import Base from '../layouts/Base.astro';
-import Clock from '../components/Clock.tsx';
-import Gauge from '../components/Gauge.tsx';
+import Dial from '../components/Dial.astro';
+import GapChart from '../components/GapChart.astro';
 import SubIndex from '../components/SubIndex.tsx';
 import MetricCard from '../components/MetricCard.tsx';
 import BillRow from '../components/BillRow.tsx';
 import WhoMoving from '../components/WhoMoving.tsx';
 import SourceCite from '../components/SourceCite.tsx';
-import Sparkline from '../components/Sparkline.tsx';
-import { fileUrl, latest, ledger, metric, previous, series, snapshotUrl, weights } from '../lib/data.ts';
+import { billsObserved, challengerMonthly, fileUrl, latest, ledger, metric, previous, series, snapshotUrl, weights } from '../lib/data.ts';
+import { gapSeries as buildGapSeries } from '../lib/gap.ts';
+import { wireItems } from '../lib/wire.ts';
+import { leadFund, leadPlan, salaryFund, shortfall } from '../lib/payoutFacts.ts';
 import { fmtNumber } from '../lib/format.ts';
 import { cuts, cutsLabel, description, gapCopy, moved, movedLabel, title } from '../lib/headline.ts';
 import { normalize } from '../../../index/normalize.ts';
@@ -41,13 +43,28 @@ const groups = groupKeys.map((g) => ({
   ...(GROUP_COPY[g] ?? { title: 'Sub-indices', sub: `weights ${latest.weightsVersion}` }),
   keys: subKeys.filter((k) => (weights.subIndices[k]?.group ?? 'all') === g),
 }));
-const gapSeries = series(gap);
+const gapPts = buildGapSeries(challengerMonthly, billsObserved);
+const gapFrom = challengerMonthly[0]?.month;
+const wire = wireItems(latest, previous);
+const cutsYtd = metric(latest, 'labor.ai_layoffs_ytd');
+const cutsShown = cutsYtd ?? cuts;
+const live = latest.bills.filter((b) => b.status !== 'expired').length;
 
 const filings = latest.filings ?? [];
 const edgarMetric = metric(latest, 'corporate.capex_headcount_gap_pp');
 const openPredictions = ledger.predictions.filter((p) => p.status === 'open');
 ---
 <Base title={title} description={description} page="index">
+  <div class="wire" slot="wire" aria-label="Latest changes and upstream records">
+    <div class="wire-track">
+      {[0, 1].map((copy) => wire.map((w) => (
+        <span class="wire-item" aria-hidden={copy === 1 ? 'true' : undefined}>
+          <b>{w.date}</b>{w.href ? <a href={w.href} tabindex={copy === 1 ? -1 : undefined}>{w.text}</a> : w.text}
+        </span>
+      )))}
+    </div>
+  </div>
+
   <section class="headline">
     <h1>The layoffs started. <span>The checks haven't.</span></h1>
     <p class="lede">
@@ -56,44 +73,13 @@ const openPredictions = ledger.predictions.filter((p) => p.status === 'open');
     </p>
   </section>
 
-  <section class="contrast">
-    <div class="panel contrast-cell">
-      <div class="contrast-value num red">{cuts ? cuts.value.toLocaleString('en-US') : 'no data'}</div>
-      <div class="contrast-label">{cutsLabel}</div>
-      {cuts && <SourceCite href={cuts.sourceUrl} name={cuts.sourceName} asOf={cuts.asOf} stale={cuts.stale} />}
-    </div>
-    <div class="contrast-vs mono" aria-hidden="true">vs</div>
-    <div class="panel contrast-cell">
-      <div class={`contrast-value num ${moved && moved.value === 0 ? 'red' : 'amber'}`}>{moved ? moved.value : 'no data'}</div>
-      <div class="contrast-label">{movedLabel}{moved && moved.value === 0 && latest.bills.length > 0 ? `, of ${latest.bills.filter((b) => b.status !== 'expired').length} introduced` : ''}</div>
-      {moved && <SourceCite href={moved.sourceUrl} name={moved.sourceName} asOf={moved.asOf} stale={moved.stale} />}
-    </div>
-  </section>
-
-  <section class="panel gap">
-    <div class="panel-head">
-      <h2>The gap: labor dislocation minus political momentum</h2>
-      <SourceCite href={snapUrl} name="snapshot sub-indices" />
-    </div>
-    <div class="gap-row">
-      <span class={`gap-value num ${gapNow !== null && gapNow > 2 ? 'red' : 'amber'}`}>{gapNow === null ? '—' : `${gapNow >= 0 ? '+' : '−'}${Math.abs(gapNow).toFixed(1)}`}</span>
-      <div>
-        <div class="gap-head">{gapText.head}</div>
-        <p class="small muted">{gapText.body}</p>
-      </div>
-      <Sparkline points={gapSeries} width={140} color="var(--violet)" />
-    </div>
-    <p class="small" style="margin:12px 0 0"><a href={`${base}/what-would-move-it`}>What would have to happen to move the score</a> · <a href={`${base}/calculator`}>What a dividend would actually pay you</a></p>
-  </section>
-
-  <div class="hero">
+  <section class="instrument">
     <div class="panel">
-      <Clock
-        client:load
-        target={latest.projectedDate}
-        confidence={latest.confidence}
-        bandMonths={latest.bandMonths}
+      <Dial
         readiness={latest.readiness}
+        projectedDate={latest.projectedDate}
+        bandMonths={latest.bandMonths}
+        confidence={latest.confidence}
         asOf={latest.date}
         citeHref={snapUrl}
         methodHref={method('#projection')}
@@ -101,20 +87,55 @@ const openPredictions = ledger.predictions.filter((p) => p.status === 'open');
     </div>
     <div class="panel">
       <div class="panel-head">
-        <h2>Composite readiness</h2>
-        <SourceCite href={snapUrl} name={`weights ${latest.weightsVersion}`} />
+        <h2>The gap{gapFrom ? `, since ${gapFrom}` : ''}</h2>
+        <SourceCite href={fileUrl('sources/curated/challenger.yaml')} name="Challenger monthly reports, Congress.gov" />
       </div>
-      <Gauge value={latest.readiness} />
-      <div class="panel-head" style="margin-top:8px">
-        <span class="small muted">trend, all snapshots</span>
-        <Sparkline points={series((s) => s.readiness)} width={140} color="var(--amber)" />
+      <GapChart pts={gapPts} />
+      <div class="gap-facts">
+        <div class="stat">
+          <div class="lbl">AI-attributed cuts, {cutsYtd ? cutsYtd.asOf.slice(0, 4) : 'last 12 mo'}</div>
+          <div class="stat-value red" data-counter={cutsYtd ? JSON.stringify({ ytd: cutsYtd.value, asOf: cutsYtd.asOf }) : undefined}>
+            {cutsShown?.value.toLocaleString('en-US') ?? '—'}
+          </div>
+          <div class="stat-note">{cutsYtd ? `${cutsYtd.value.toLocaleString('en-US')} reported to ${cutsYtd.asOf}; live figure interpolated from YTD ÷ days elapsed` : cutsLabel}</div>
+          {cutsShown && <SourceCite href={cutsShown.sourceUrl} name={cutsShown.sourceName} asOf={cutsShown.asOf} />}
+        </div>
+        <div class="stat">
+          <div class="lbl">{movedLabel}</div>
+          <div class={`stat-value ${moved && moved.value === 0 ? 'red' : 'amber'}`}>{moved ? moved.value : '—'}</div>
+          <div class="stat-note">of {live} introduced and watched</div>
+          {moved && <SourceCite href={moved.sourceUrl} name={moved.sourceName} asOf={moved.asOf} stale={moved.stale} />}
+        </div>
+        <div class="stat">
+          <div class="lbl">Labor minus politics</div>
+          <div class={`stat-value ${gapNow !== null && gapNow > 2 ? 'red' : 'amber'}`}>{gapNow === null ? '—' : `${gapNow >= 0 ? '+' : '−'}${Math.abs(gapNow).toFixed(1)}`}</div>
+          <div class="stat-note">{gapText.head.toLowerCase()}</div>
+          <SourceCite href={snapUrl} name="snapshot sub-indices" />
+        </div>
       </div>
-      <p class="thesis">
-        Checks do not arrive from goodwill. They arrive when consumer spending breaks: AI cuts
-        white-collar payroll, displaced workers stop spending, everyone else bleeds, politicians panic.
-      </p>
+      {leadFund && shortfall && (
+        <p class="gap-line">
+          $1,000/month for everyone needs an <span class="num">{fmtNumber(salaryFund, 'USD')}</span> fund.
+          The bill creates <span class="num">{fmtNumber(leadFund, 'USD')}</span>. <span class="num">{shortfall.toFixed(0)}×</span> short.{' '}
+          <SourceCite href={leadPlan.sourceUrl} name={leadPlan.name.split(',')[0] ?? leadPlan.name} /> <a class="small" href={`${base}/calculator`}>what you'd get</a>
+        </p>
+      )}
     </div>
-  </div>
+  </section>
+
+  <section class="panel">
+    <div class="gap-row">
+      <div>
+        <div class="gap-head">{gapText.head}</div>
+        <p class="small">{gapText.body}</p>
+      </div>
+    </div>
+    <p class="thesis" style="margin-top:14px">
+      Checks do not arrive from goodwill. They arrive when consumer spending breaks: AI cuts
+      white-collar payroll, displaced workers stop spending, everyone else bleeds, politicians panic.
+    </p>
+    <p class="small" style="margin:12px 0 0"><a href={`${base}/what-would-move-it`}>What would have to happen to move the score</a> · <a href={`${base}/calculator`}>What a dividend would actually pay you</a></p>
+  </section>
 
   <section class="groups">
     {groups.map((g) => (
@@ -246,3 +267,13 @@ const openPredictions = ledger.predictions.filter((p) => p.status === 'open');
     </div>
   </section>
 </Base>
+
+<script>
+  import { interpolate, startCounters } from '../lib/counter.ts';
+  const items = [...document.querySelectorAll<HTMLElement>('[data-counter]')].flatMap((el) => {
+    const { ytd, asOf } = JSON.parse(el.dataset.counter ?? '{}') as { ytd?: number; asOf?: string };
+    if (typeof ytd !== 'number' || !asOf) return [];
+    return [{ el, c: interpolate(ytd, `${asOf}T23:59:59Z`, `${asOf.slice(0, 4)}-01-01T00:00:00Z`) }];
+  });
+  if (items.length && !matchMedia('(prefers-reduced-motion: reduce)').matches) startCounters(items);
+</script>
