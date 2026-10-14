@@ -26,7 +26,8 @@ export interface Company {
   capex: string[];
 }
 
-export const DEFAULT_SEC_USER_AGENT = 'the-trigger github.com/destinjones/the-trigger 46937471+destinjones@users.noreply.github.com';
+// SEC's documented form is "Company Name AdminContact@domain": a name, then an email, nothing else.
+export const DEFAULT_SEC_USER_AGENT = 'TheTrigger 46937471+destinjones@users.noreply.github.com';
 
 export const COMPANIES: Company[] = [
   { name: 'Microsoft', ticker: 'MSFT', cik: 789019, capex: ['PaymentsToAcquirePropertyPlantAndEquipment'] },
@@ -212,7 +213,7 @@ export const edgar: RichSource = {
     // SEC fair access: the User-Agent must name the requester and give a contact
     // email, or data.sec.gov answers 403. SEC_USER_AGENT overrides the default.
     const ua = ctx.env.SEC_USER_AGENT || DEFAULT_SEC_USER_AGENT;
-    const headers = { 'user-agent': ua };
+    const headers = { 'user-agent': ua, 'accept-encoding': 'gzip, deflate' };
     const rows: FilingRecord[] = [];
     const errors: string[] = [];
     for (const c of COMPANIES) {
