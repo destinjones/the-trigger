@@ -52,10 +52,22 @@ const live = latest.bills.filter((b) => b.status !== 'expired').length;
 
 const filings = latest.filings ?? [];
 const edgarMetric = metric(latest, 'corporate.capex_headcount_gap_pp');
-const openPredictions = ledger.predictions.filter((p) => p.status === 'open');
+const openPredictions = ledger.predictions.filter((p) => p.status === 'open').reverse();
+// The newest projection is the one the dial shows; check-site fails the build if they disagree.
+const currentProjection = ledger.predictions.slice().reverse().find((p) => p.kind === 'projection');
+if (!currentProjection?.window) throw new Error('predictions/ledger.json has no projection; run pnpm scorecard');
+const projectionWindow = currentProjection.window;
 ---
 <Base title={title} description={description} page="index">
-  <div class="wire" slot="wire" aria-label="Latest changes and upstream records">
+  <section class="headline">
+    <h1>The layoffs started. <span>The checks haven't.</span></h1>
+    <p class="lede">
+      The Trigger tracks how close the US is to paying every citizen a dividend funded by AI.
+      Every number is cited, every snapshot is in git, and every projection is graded in public.
+    </p>
+  </section>
+
+  <div class="wire" aria-label="Latest changes and upstream records">
     <div class="wire-track">
       {[0, 1].map((copy) => wire.map((w) => (
         <span class="wire-item" aria-hidden={copy === 1 ? 'true' : undefined}>
@@ -65,23 +77,17 @@ const openPredictions = ledger.predictions.filter((p) => p.status === 'open');
     </div>
   </div>
 
-  <section class="headline">
-    <h1>The layoffs started. <span>The checks haven't.</span></h1>
-    <p class="lede">
-      The Trigger tracks how close the US is to paying every citizen a dividend funded by AI.
-      Every number is cited, every snapshot is in git, and every projection is graded in public.
-    </p>
-  </section>
-
   <section class="instrument">
     <div class="panel">
       <Dial
         readiness={latest.readiness}
         projectedDate={latest.projectedDate}
+        window={projectionWindow}
         bandMonths={latest.bandMonths}
         confidence={latest.confidence}
         asOf={latest.date}
         citeHref={snapUrl}
+        ledgerHref={fileUrl('predictions/ledger.json')}
         methodHref={method('#projection')}
       />
     </div>
@@ -245,7 +251,18 @@ const openPredictions = ledger.predictions.filter((p) => p.status === 'open');
         <thead><tr><th>Made</th><th>Claim</th><th>Conf.</th></tr></thead>
         <tbody>
           {openPredictions.map((p) => (
-            <tr><td class="num nowrap">{p.madeOn}</td><td>{p.claim}</td><td class="num">{Math.round(p.confidence * 100)}%</td></tr>
+            <tr class={p.kind === 'projection' && p !== currentProjection ? 'superseded' : ''}>
+              <td class="num nowrap">{p.madeOn}{p.revision ? ` r${p.revision}` : ''}</td>
+              <td>
+                {p.claim}
+                <div class="small muted">
+                  {p.kind === 'manual' ? `Written by hand, weights ${p.weightsVersion}.`
+                    : p === currentProjection ? `Current projection, weights ${p.weightsVersion}. This is what the dial shows.`
+                    : `Superseded by a later projection (weights ${p.weightsVersion} at the time). Kept and still graded.`}
+                </div>
+              </td>
+              <td class="num">{Math.round(p.confidence * 100)}%</td>
+            </tr>
           ))}
         </tbody>
       </table>

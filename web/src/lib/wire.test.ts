@@ -12,10 +12,12 @@ const s = {
 } as unknown as Snapshot;
 
 describe('wire', () => {
-  it('lists newest records first, with links, and failures', () => {
+  it('lists newest records first, with links, and leaves source failures to the status panel', () => {
     const w = wireItems(s, null);
-    expect(w.map((i) => i.text)).toEqual(['govtrack: source failed, last value carried forward', 'Newer: 4.2%', 'Older: 1']);
-    expect(w[1]?.href).toBe('https://b');
+    expect(w.map((i) => i.text)).toEqual(['Newer: 4.2%', 'Older: 1']);
+    expect(w[0]?.href).toBe('https://b');
+    const prev = { ...s, sourcesFailed: [], date: '2026-10-13' } as Snapshot;
+    expect(wireItems(s, prev).some((i) => i.text.includes('govtrack'))).toBe(false);
   });
   it('leads with changes since the previous snapshot', () => {
     const prev = { ...s, readiness: 27.0, date: '2026-10-13' } as Snapshot;

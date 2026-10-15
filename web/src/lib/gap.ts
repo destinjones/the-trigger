@@ -38,6 +38,9 @@ export function gapSeries(monthly: MonthlyCuts[], bills: BillsObservation[]): Ga
   });
 }
 
+/** Pixels between the x axis and a zero bills line. */
+export const BILLS_FLOOR = 7;
+
 export function gapGeometry(pts: GapPoint[], W = 656, H = 200, padTop = 26, padBot = 24) {
   const [first] = pts;
   const last = pts.at(-1);
@@ -48,8 +51,10 @@ export function gapGeometry(pts: GapPoint[], W = 656, H = 200, padTop = 26, padB
   const span = (last.t - t0) || 1;
 
   const X = (t: number) => ((t - t0) / span) * W;
-  const Yc = (c: number) => padTop + (1 - c / maxCuts) * (H - padTop - padBot);
-  const Yb = (b: number) => (H - padBot) - (b / maxBills) * (H * 0.16);
+  const Yc = (c: number) => padTop + (1 - c / maxCuts) * (H - padTop - padBot - BILLS_FLOOR);
+  // Both series start from a floor a few pixels above the axis, so a bills line
+  // that never leaves zero still reads as a line rather than as the axis.
+  const Yb = (b: number) => (H - padBot - BILLS_FLOOR) - (b / maxBills) * (H * 0.16);
 
   const cutsPath = pts.map((p, i) => `${i ? 'L' : 'M'}${X(p.t).toFixed(1)} ${Yc(p.cuts).toFixed(1)}`).join('');
   const billsPath = pts.map((p, i) => `${i ? 'L' : 'M'}${X(p.t).toFixed(1)} ${Yb(p.bills).toFixed(1)}`).join('');

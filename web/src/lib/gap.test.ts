@@ -16,11 +16,12 @@ describe('gap chart', () => {
   });
   it('draws paths, a closed gap, and year ticks; nothing for one point', () => {
     const g = gapGeometry([{ t: 2025.5, cuts: 0, bills: 0 }, { t: 2026.5, cuts: 100, bills: 0 }]);
-    expect(g?.cutsPath).toBe('M0.0 176.0L656.0 26.0');
+    expect(g?.cutsPath).toBe('M0.0 169.0L656.0 26.0');
+    expect(g?.billsPath).toBe('M0.0 169.0L656.0 169.0');
     expect(g?.gapPath.endsWith('Z')).toBe(true);
     expect(g?.years.map((y) => y.label)).toEqual(['2025', '2026']);
     expect(g?.years[0]?.anchor).toBe('start');
-    expect(g?.cutsLength).toBeCloseTo(Math.hypot(656, 150), 3);
+    expect(g?.cutsLength).toBeCloseTo(Math.hypot(656, 143), 3);
     expect(gapGeometry([{ t: 2026, cuts: 1, bills: 0 }])).toBeNull();
   });
 });

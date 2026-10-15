@@ -1,58 +1,70 @@
 ---
 /**
- * One object for score, date, and time: the outer arc is readiness, the inner
- * scale is 2026–2035 with a marker for today (amber, crawls live) and one for
- * the projected first check (cyan). Never shows the date without its band.
+ * One object for score, date, and time. The outer ring is time, 2026–2035:
+ * the cyan arc is the projection window from the prediction ledger, the white
+ * dot its point estimate, the small marker today. The thin inner ring is
+ * readiness on its own 0–100 scale, matching the centre number. Never shows
+ * the date without its band.
  */
 import SourceCite from './SourceCite.tsx';
-import { ARC, CIRC, DIAL, dialGeometry, polar, yearAngle, yearFraction } from '../lib/dial.ts';
-import { fmtDate } from '../lib/format.ts';
+import { ARC_INNER, CIRC, CIRC_INNER, DIAL, dialGeometry, yearAngle, yearFraction } from '../lib/dial.ts';
+import { fmtDate, scoreColor } from '../lib/format.ts';
 import { quarterOf } from '../lib/headline.ts';
 
 interface Props {
   readiness: number;
   projectedDate: string;
+  window: { from: string; to: string };
   bandMonths: number;
   confidence: number;
   asOf: string;
   citeHref: string;
+  ledgerHref: string;
   methodHref: string;
 }
-const { readiness, projectedDate, bandMonths, confidence, asOf, citeHref, methodHref } = Astro.props;
-const g = dialGeometry(readiness);
-const { cx, cy, r } = DIAL;
-const [tx1, ty1] = polar(yearAngle(yearFraction(projectedDate)), 124);
-const [tx2, ty2] = polar(yearAngle(yearFraction(projectedDate)), 134);
+const { readiness, projectedDate, window: win, bandMonths, confidence, asOf, citeHref, ledgerHref, methodHref } = Astro.props;
+const g = dialGeometry({ readiness, windowFrom: win.from, windowTo: win.to, projectedDate });
+const { cx, cy, r, rInner } = DIAL;
 const nowAngle = yearAngle(yearFraction(asOf));
 const days = Math.round((Date.parse(`${projectedDate}T00:00:00Z`) - Date.parse(`${asOf}T00:00:00Z`)) / 86_400_000);
 ---
 <div class="dial-panel">
   <svg class="dial" viewBox="0 0 340 340" role="img"
-       aria-label={`Readiness ${readiness.toFixed(1)} of 100. First federal check projected ${projectedDate}, plus or minus ${bandMonths} months.`}>
+       aria-label={`Readiness ${readiness.toFixed(1)} of 100. First federal check projected ${projectedDate}, window ${win.from} to ${win.to}.`}>
     {g.ticks.map((t) => <line class={`dial-tick${t.major ? ' major' : ''}`} x1={t.x1.toFixed(1)} y1={t.y1.toFixed(1)} x2={t.x2.toFixed(1)} y2={t.y2.toFixed(1)} />)}
     <circle class="dial-track" cx={cx} cy={cy} r={r} transform={`rotate(135 ${cx} ${cy})`}
-            stroke-dasharray={`${ARC.toFixed(1)} ${CIRC.toFixed(1)}`} />
-    <circle class="dial-prog" cx={cx} cy={cy} r={r} transform={`rotate(135 ${cx} ${cy})`}
-            stroke-dasharray={`${ARC.toFixed(1)} ${CIRC.toFixed(1)}`} stroke-dashoffset={g.offset.toFixed(1)}
-            style={`--arc:${ARC.toFixed(1)}`} />
+            stroke-dasharray={`${(CIRC * 0.75).toFixed(1)} ${CIRC.toFixed(1)}`} />
+    <circle class="dial-prog" cx={cx} cy={cy} r={r} transform={`rotate(${g.band.start.toFixed(2)} ${cx} ${cy})`}
+            stroke-dasharray={`${g.band.length.toFixed(1)} ${CIRC.toFixed(1)}`} stroke-dashoffset="0"
+            style={`--arc:${g.band.length.toFixed(1)}`} />
     <g class="dial-dot-g" style={`--to:${g.dotAngle.toFixed(2)}deg`}><circle class="dial-dot" cx={cx + r} cy={cy} r="5.5" /></g>
-
-    {g.years.map((y) => <text class={`dial-year${y.year < Number(asOf.slice(0, 4)) ? ' past' : ''}`} x={y.x.toFixed(1)} y={(y.y + 3).toFixed(1)} text-anchor="middle">{y.label}</text>)}
-    <line class="dial-target" x1={tx1.toFixed(1)} y1={ty1.toFixed(1)} x2={tx2.toFixed(1)} y2={ty2.toFixed(1)} />
     <g id="dial-now" style={`transform-box:view-box;transform-origin:${cx}px ${cy}px;transform:rotate(${nowAngle.toFixed(3)}deg)`}>
-      <circle class="dial-now" cx={cx + 129} cy={cy} r="2.6" />
+      <line class="dial-now" x1={cx + r - 8} y1={cy} x2={cx + r + 8} y2={cy} />
     </g>
+    {g.years.map((y) => <text class={`dial-year${y.year < Number(asOf.slice(0, 4)) ? ' past' : ''}`} x={y.x.toFixed(1)} y={(y.y + 3).toFixed(1)} text-anchor="middle">{y.label}</text>)}
 
+    <circle class="dial-inner-track" cx={cx} cy={cy} r={rInner} transform={`rotate(135 ${cx} ${cy})`}
+            stroke-dasharray={`${ARC_INNER.toFixed(1)} ${CIRC_INNER.toFixed(1)}`} />
+    <circle class="dial-inner" cx={cx} cy={cy} r={rInner} transform={`rotate(135 ${cx} ${cy})`}
+            stroke-dasharray={`${ARC_INNER.toFixed(1)} ${CIRC_INNER.toFixed(1)}`} stroke-dashoffset={g.innerOffset.toFixed(1)}
+            style={`stroke:${scoreColor(readiness)};--arc:${ARC_INNER.toFixed(1)}`} />
     <text class="dial-value" x={cx} y={cy + 14} text-anchor="middle">{readiness.toFixed(1)}</text>
     <text class="dial-label" x={cx} y={cy + 38} text-anchor="middle">READINESS / 100</text>
   </svg>
+  <div class="dial-legend">
+    <span><i class="sw band"></i>window</span>
+    <span><i class="sw dot"></i>point estimate</span>
+    <span><i class="sw now"></i>today</span>
+    <span><i class="sw inner" style={`background:${scoreColor(readiness)}`}></i>readiness</span>
+  </div>
   <div class="lbl">Projected first federal check</div>
   <div class="dial-date num">{fmtDate(projectedDate)}</div>
   <div class="dial-meta">
     ±<b>{bandMonths}</b> mo band · <b>{Math.round(confidence * 100)}%</b> confidence · {quarterOf(projectedDate)} ·{' '}
     <span id="dial-days" data-target={projectedDate}>{days.toLocaleString('en-US')}</span> days
   </div>
-  <div class="dial-cite"><SourceCite href={citeHref} name={`snapshot ${asOf}`} /> · <a class="small" href={methodHref}>how this is computed</a></div>
+  <div class="dial-cite"><SourceCite href={ledgerHref} name="prediction ledger" />{' · '}<SourceCite href={citeHref} name={`snapshot ${asOf}`} /></div>
+  <a class="small dial-method" href={methodHref}>how this is computed</a>
 </div>
 
 <script>
