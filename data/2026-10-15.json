@@ -1,6 +1,6 @@
 {
   "date": "2026-10-15",
-  "revision": 0,
+  "revision": 1,
   "weightsVersion": "v2",
   "readiness": 28.1,
   "projectedDate": "2031-01-01",
@@ -128,7 +128,7 @@
     {
       "metricId": "markets.passage_probability",
       "label": "Market odds of federal household checks",
-      "value": 3.1,
+      "value": 2.7,
       "unit": "%",
       "asOf": "2026-10-15",
       "fetchedAt": "2026-10-15T00:00:00Z",
