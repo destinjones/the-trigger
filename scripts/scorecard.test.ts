@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { brier, expire, recordProjection, renderScoreboard, type Ledger, type Prediction } from './lib/scorecard.ts';
+import { brier, expire, projectionMismatch, recordProjection, renderScoreboard, type Ledger, type Prediction } from './lib/scorecard.ts';
 
 const snap = { date: '2026-10-14', revision: 0, weightsVersion: 'v1', projectedDate: '2031-03-12', confidence: 0.54, bandMonths: 22, readiness: 25.7 };
 const empty: Ledger = { predictions: [] };
@@ -20,6 +20,15 @@ describe('scorecard', () => {
   it('logs again when confidence or window moves', () => {
     const l = recordProjection(recordProjection(empty, snap), { ...snap, date: '2026-11-01', confidence: 0.56 });
     expect(l.predictions).toHaveLength(2);
+  });
+  it('logs a same-day revision that changes the projection, keeping the first', () => {
+    const l = recordProjection(recordProjection(empty, snap), { ...snap, revision: snap.revision + 1, projectedDate: '2031-01-01', bandMonths: 22, confidence: 0.55 });
+    expect(l.predictions.map((p) => p.id)).toEqual([`p-${snap.date}-projection`, `p-${snap.date}-projection-r${snap.revision + 1}`]);
+  });
+  it('flags a ledger that disagrees with the snapshot', () => {
+    const l = recordProjection(empty, snap);
+    expect(projectionMismatch(l, snap)).toBeNull();
+    expect(projectionMismatch(l, { ...snap, confidence: 0.55 })).toContain('0.55');
   });
   it('expires overdue open predictions as misses', () => {
     const l = expire(recordProjection(empty, snap), '2033-02-01');

@@ -31,7 +31,7 @@ pnpm snapshot -- --date 2026-10-14 --replay fixtures/cassettes/2026-10-14.json -
 
 | Piece | Where |
 |---|---|
-| Weighting, with a comment on every line | [`index/weights.v2.yaml`](index/weights.v2.yaml) (default; [v1](index/weights.v1.yaml) still runs) |
+| Weighting, with a comment on every line | [`index/weights.v2.yaml`](index/weights.v2.yaml) (default; [v1](index/weights.v1.yaml) still runs). Every change and why: [WEIGHTS.md](WEIGHTS.md) |
 | Per-metric 0–100 transforms and their reasoning | [`index/normalize.ts`](index/normalize.ts) |
 | Composite and projection (pure, tested) | [`index/model.ts`](index/model.ts) |
 | One module per source, one interface | [`sources/`](sources) |
@@ -45,7 +45,7 @@ Design rules: git is the database (no backend, nothing fetched in the browser); 
 ## Argue with the index
 
 1. Copy `index/weights.v2.yaml` to `weights.v3.yaml` and change what you disagree with. Say why in the comments.
-2. `pnpm snapshot -- --weights v2 --dry-run` to see your score and date.
+2. `pnpm snapshot -- --weights v3 --dry-run` to see your score and date.
 3. Open a pull request with the result.
 
 Disagree with an anchor instead (say, 9% unemployment as "trigger pulled")? Edit `index/normalize.ts`; the tests tell you what moved.
@@ -56,7 +56,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md): fixing a curated value or adding a poll 
 
 ## Sources
 
-Tier 1: BLS, Congress.gov, GovTrack, FRED, Federal Register. Tier 2: guaranteed-income pilot records, national polling, LegiScan, SEC EDGAR (AI capex vs headcount, parsed from 10-Ks), corporate equity commitments. Tier 3: Challenger AI-attributed layoffs, Kalshi. Any source can fail without breaking the run: its last value is carried forward and marked stale. Details and terms in [DATA_LICENSE.md](DATA_LICENSE.md).
+Tier 1: BLS, Congress.gov, FRED, Federal Register (GovTrack retired 2026-10-15 after its API returned 502 throughout). Tier 2: guaranteed-income pilot records, national polling, LegiScan, SEC EDGAR (AI capex vs headcount, parsed from 10-Ks), corporate equity commitments. Tier 3: Challenger AI-attributed layoffs, Kalshi. Any source can fail without breaking the run: its last value is carried forward and marked stale. Details and terms in [DATA_LICENSE.md](DATA_LICENSE.md).
 
 ## Deploy
 

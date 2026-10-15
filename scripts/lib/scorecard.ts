@@ -18,6 +18,8 @@ export interface Prediction {
   /** For projections: the window the payment must land in. */
   window?: { from: string; to: string };
   snapshot?: string;
+  /** For projections: the snapshot revision it was logged from. */
+  revision?: number;
 }
 
 export interface Ledger {
@@ -47,8 +49,11 @@ export function quarterOf(iso: string): string {
 
 /**
  * Log the snapshot's projection if it differs from the last logged projection
- * (different quarter, band, or confidence). Daily re-statements of the same
- * projection are not new predictions.
+ * (different band months or confidence). Daily re-statements of the same
+ * projection are not new predictions. A same-day revision that changes the
+ * projection (new weights, a corrected input) is logged as its own entry with
+ * the revision in its id; the earlier entry stays in the ledger and is still
+ * graded. The newest projection is the one the site shows.
  */
 export function recordProjection(ledger: Ledger, s: SnapshotLike): Ledger {
   const last = [...ledger.predictions].reverse().find((p) => p.kind === 'projection');
@@ -62,8 +67,9 @@ export function recordProjection(ledger: Ledger, s: SnapshotLike): Ledger {
   ) {
     return ledger;
   }
-  const id = `p-${s.date}-projection`;
-  if (ledger.predictions.some((p) => p.id === id)) return ledger; // same-day revision: first statement stands
+  const base = `p-${s.date}-projection`;
+  const id = ledger.predictions.some((p) => p.id === base) ? `${base}-r${s.revision}` : base;
+  if (ledger.predictions.some((p) => p.id === id)) return ledger;
   const p: Prediction = {
     id,
     madeOn: s.date,
@@ -77,8 +83,26 @@ export function recordProjection(ledger: Ledger, s: SnapshotLike): Ledger {
     kind: 'projection',
     window: { from, to },
     snapshot: `data/${s.date}.json`,
+    revision: s.revision,
   };
   return { ...ledger, predictions: [...ledger.predictions, p] };
+}
+
+/** The newest projection, which must agree with the newest snapshot. */
+export function currentProjection(ledger: Ledger): Prediction | undefined {
+  return [...ledger.predictions].reverse().find((p) => p.kind === 'projection');
+}
+
+/** Problems if the ledger's current projection does not state the snapshot's projection. */
+export function projectionMismatch(ledger: Ledger, s: SnapshotLike): string | null {
+  const p = currentProjection(ledger);
+  if (!p?.window) return 'ledger has no projection';
+  const from = addMonths(s.projectedDate, -s.bandMonths);
+  const to = addMonths(s.projectedDate, s.bandMonths);
+  if (p.window.from !== from || p.window.to !== to || p.confidence !== s.confidence) {
+    return `ledger states ${p.window.from}..${p.window.to} at ${p.confidence}; snapshot ${s.date} r${s.revision} projects ${from}..${to} at ${s.confidence}`;
+  }
+  return null;
 }
 
 /** Open predictions whose deadline has passed without a recorded hit become misses. */

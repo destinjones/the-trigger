@@ -3,6 +3,7 @@ import Base from '../layouts/Base.astro';
 import { TRANSFORMS } from '../../../index/normalize.ts';
 import { PROJECTION, project } from '../../../index/model.ts';
 import { REPO_URL, fileUrl, latest, weights, weightsPath } from '../lib/data.ts';
+import SourceCite from '../components/SourceCite.tsx';
 import { DISCOUNTS } from '../../../sources/corporate.ts';
 import { POLL_HALF_LIFE_DAYS, POLL_MAX_AGE_DAYS } from '../../../sources/polling.ts';
 
@@ -56,7 +57,8 @@ const fixture = project(34, 88, '2026-10-14');
       that was fed (<code>weightCovered</code>, now {Math.round(latest.weightCovered * 100)}%).
     </p>
 
-    <h3>What changed in v2</h3>
+    <h3 id="changelog">Weights changelog: v1 to v2</h3>
+    <p>The only reweighting so far. Same inputs scored <span class="num">25.7</span> under v1 <SourceCite href={`${REPO_URL}/blob/80ca01b/data/2026-10-14.json`} name="r2, v1" /> and <span class="num">28.1</span> under v2 <SourceCite href={`${REPO_URL}/blob/8326a8a/data/2026-10-14.json`} name="r3, v2" />. Every version, every revision of the first snapshot, and the rationale are in <a href={fileUrl('WEIGHTS.md')}>WEIGHTS.md</a>.</p>
     <ul>
       <li><b>Fiscal pressure 0.15 → 0.05.</b> The deficit says whether the government is stretched, not whether AI is displacing anyone, and its sign is ambiguous. In v1 it carried as much weight as public opinion.</li>
       <li><b>Labor dislocation 0.25 → 0.30.</b> It is the thesis.</li>
@@ -144,7 +146,7 @@ bandMonths    = (100 − readiness) / 100 × ${PROJECTION.maxBandMonths}`}</pre>
 
     <h2 id="sources">Sources and failure handling</h2>
     <p>
-      Tier 1 (BLS, Congress.gov, GovTrack, FRED, Federal Register) are federal or open APIs. Tier 2 and 3 include SEC
+      Tier 1 (BLS, Congress.gov, FRED, Federal Register) are federal or open APIs. Tier 2 and 3 include SEC
       EDGAR, LegiScan, prediction markets, and hand-curated files for publishers with no API (Challenger layoff reports,
       national polls, pilot program records). Curated files live in <a href={`${REPO_URL}/tree/main/sources/curated`}>sources/curated/</a>,
       every value with a deep link, and a curated file is treated as a failed source if no one has re-reviewed it
@@ -179,7 +181,7 @@ bandMonths    = (100 − readiness) / 100 × ${PROJECTION.maxBandMonths}`}</pre>
       <li><b>Proposal sizes are our arithmetic.</b> "5% of OpenAI" is converted to dollars at OpenAI's last disclosed valuation. A private valuation is a negotiated number, and the discounts by status are an editorial choice.</li>
       <li><b>Headcount comes from prose.</b> 10-Ks rarely tag employee counts in XBRL, so EDGAR headcount is parsed from the Human Capital paragraph. A reworded sentence can drop a company from the comparison, and headcount is global while the thesis is about US payroll.</li>
       <li><b>Fiscal pressure cuts both ways.</b> High deficits can block new spending as easily as force it. We score deficits as pressure toward change, at a weight of 0.05 in v2; you may reasonably flip the sign.</li>
-      <li><b>GovTrack has been unreachable.</b> govtrack.us returned 502 for the whole site in October 2026. Its prognosis is unscored, so the index does not move, but the calibration card goes stale until it returns.</li>
+      <li><b>GovTrack is retired.</b> govtrack.us returned 502 on every request from the first snapshot, so the source was removed on 2026-10-15. Its prognosis was unscored, so the index did not move; Congress.gov supplies bill status.</li>
       <li><b>Renormalizing over missing sub-indices hides gaps.</b> If a whole sub-index goes dark, the composite leans on what remains. <code>weightCovered</code> exposes this, but the headline number does not.</li>
       <li><b>Mixed cadences.</b> Inputs update daily, monthly and annually (the deficit is a fiscal-year figure). A daily snapshot is mostly yesterday's numbers.</li>
     </ul>
