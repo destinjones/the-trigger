@@ -12,7 +12,7 @@ are released under CC0.
 |---|---|---|---|
 | U.S. Bureau of Labor Statistics (api.bls.gov) | Unemployment (LNS14000000), payrolls (CES0000000001), JOLTS openings (JTS540099000000000JOL) | No key; optional `BLS_API_KEY` | Public domain (U.S. government work). BLS asks that it be cited as the source and that it not be implied to endorse this project. |
 | Congress.gov API (Library of Congress) | Bill records, co-sponsors, actions | `CONGRESS_API_KEY` (free); falls back to api.data.gov `DEMO_KEY` | Public domain U.S. government data; subject to api.data.gov rate limits. |
-| GovTrack.us | Bill status labels, enactment prognosis | No key | GovTrack data is open; attribution to GovTrack.us requested. Prognosis is GovTrack's model. |
+| GovTrack.us | Bill status labels, enactment prognosis | No key | GovTrack data is open; attribution to GovTrack.us requested. Prognosis is GovTrack's model. Retired 2026-10-15 (API returned 502); not called. |
 | FRED, Federal Reserve Bank of St. Louis | Deficit % GDP (FYFSGDA188S), interest outlays (FYOINT), receipts (FYFR) | No key (fredgraph CSV); optional `FRED_API_KEY` | Underlying series are OMB/Treasury public data. FRED terms of use apply to the API; attribute "Federal Reserve Bank of St. Louis, FRED". |
 | Federal Register API (National Archives) | Presidential documents citing AI | No key | Public domain U.S. government work. |
 | SEC EDGAR | Capex (XBRL company concepts), headcount (10-K text) | No key; `SEC_USER_AGENT` with contact info required by SEC | Public domain. SEC fair-access policy: identify yourself in the User-Agent, stay under 10 requests/second. |

@@ -4,7 +4,7 @@ import { fakeHttp, replayHttp } from './_http.ts';
 import type { FetchContext, Http, Source } from './_types.ts';
 import { curatedOutput, daysBetween } from './_curated.ts';
 import {
-  COMPANIES, annualFacts, annualReports, capexHeadcountGap, conceptUrl, docUrl, edgar, htmlToText, parseHeadcount, submissionsUrl,
+  COMPANIES, annualFacts, annualReports, capexHeadcountGap, checkSecUserAgent, conceptUrl, docUrl, edgar, htmlToText, parseHeadcount, secHttp, submissionsUrl,
 } from './edgar.ts';
 import { kalshi, marketPct } from './kalshi.ts';
 import { pilots } from './pilots.ts';
@@ -95,7 +95,7 @@ describe('edgar', () => {
       [`GET ${docUrl(c, '0001193125-26-323660', 'msft-20260630.htm')}`]: '<p>Human Capital</p><p>As of June 30, 2026, we employed approximately 220,000 people</p>',
       [`GET ${docUrl(c, '0000950170-25-100235', 'msft-20250630.htm')}`]: '<p>Human Capital</p><p>As of June 30, 2025, we employed approximately 228,000 people</p>',
     });
-    const out = await edgar.fetchRich(ctx(http));
+    const out = await edgar.fetchRich(ctx(http, '2026-10-14', { SEC_USER_AGENT: 'The Trigger test@example.org', SEC_MIN_INTERVAL_MS: '0' }));
     const row = out.filings?.find((f) => f.ticker === 'MSFT');
     expect(row?.capexYoyPct).toBeCloseTo(79.6, 1);
     expect(row?.headcountYoyPct).toBeCloseTo(-3.5, 1);
@@ -103,6 +103,31 @@ describe('edgar', () => {
     expect(out.metrics[0]?.sourceUrl).toBe(docUrl(c, '0001193125-26-323660', 'msft-20260630.htm'));
     // The other five companies 404 on the fake and are skipped, not fatal.
     expect(out.filings).toHaveLength(1);
+  });
+});
+
+describe('sec client', () => {
+  it('requires a contact email and refuses noreply addresses', () => {
+    expect(() => checkSecUserAgent('TheTrigger')).toThrow(/contact email/);
+    expect(() => checkSecUserAgent('x 1+bot@users.noreply.github.com')).toThrow(/noreply/);
+    expect(() => checkSecUserAgent('The Trigger admin@example.org')).not.toThrow();
+  });
+  it('sends the User-Agent on every host and spaces requests', async () => {
+    const seen: string[] = [];
+    const waits: number[] = [];
+    const inner = {
+      getJson: async (url: string, init?: { headers?: Record<string, string> }) => { seen.push(`${new URL(url).host} ${init?.headers?.['user-agent']}`); return {}; },
+      getText: async (url: string, init?: { headers?: Record<string, string> }) => { seen.push(`${new URL(url).host} ${init?.headers?.['user-agent']}`); return ''; },
+      postJson: async () => ({}),
+    } as unknown as Http;
+    const http = secHttp(inner, 'The Trigger admin@example.org', 200, async (ms) => { waits.push(ms); });
+    await http.getJson('https://data.sec.gov/submissions/CIK0000789019.json');
+    await http.getText('https://www.sec.gov/Archives/edgar/data/789019/x/msft.htm');
+    expect(seen).toEqual(['data.sec.gov The Trigger admin@example.org', 'www.sec.gov The Trigger admin@example.org']);
+    expect(waits).toEqual([200]);
+  });
+  it('is skipped, not failed, without SEC_USER_AGENT', () => {
+    expect(edgar.requiresEnv).toBe('SEC_USER_AGENT');
   });
 });
 

@@ -26,12 +26,40 @@ export interface Company {
   capex: string[];
 }
 
-// SEC's documented form is "Company Name AdminContact@domain". Set SEC_USER_AGENT to
-// that with a real inbox. Tested from a GitHub Actions runner on 2026-10-14:
-// data.sec.gov answers 403 to any agent carrying a users.noreply.github.com
-// address, and 200 to a plain name, so the default is the name alone rather
-// than an address SEC refuses.
-export const DEFAULT_SEC_USER_AGENT = 'TheTrigger';
+// SEC fair access (https://www.sec.gov/os/accessing-edgar-data): every request to
+// any sec.gov host must carry a User-Agent naming the requester with a contact
+// email, "Company Name AdminContact@domain", and stay under 10 requests/second.
+// Tested from a GitHub Actions runner on 2026-10-14: data.sec.gov accepts a bare
+// name, but www.sec.gov/Archives (the 10-K documents) answers 403 "Undeclared
+// Automated Tool" without an email, and both refuse users.noreply.github.com
+// addresses. So the source requires SEC_USER_AGENT and is skipped without it.
+
+/** Spacing between SEC requests: 5/second, half SEC's ceiling. */
+export const SEC_MIN_INTERVAL_MS = 200;
+
+export function checkSecUserAgent(ua: string): void {
+  if (!/\S+@\S+\.\S+/.test(ua)) throw new Error('SEC_USER_AGENT must name the requester and include a contact email, e.g. "The Trigger admin@example.org"');
+  if (/users\.noreply\.github\.com/i.test(ua)) throw new Error('SEC_USER_AGENT: SEC refuses GitHub noreply addresses; use a real inbox');
+}
+
+/**
+ * Every SEC request goes through this, so no caller can forget the header or
+ * the throttle.
+ */
+export function secHttp(http: Http, ua: string, minIntervalMs = SEC_MIN_INTERVAL_MS, sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))): Http {
+  checkSecUserAgent(ua);
+  const headers = { 'user-agent': ua, 'accept-encoding': 'gzip, deflate' };
+  let first = true;
+  const pace = async () => {
+    if (!first && minIntervalMs > 0) await sleep(minIntervalMs);
+    first = false;
+  };
+  return {
+    async getJson<T = unknown>(url: string) { await pace(); return http.getJson<T>(url, { headers }); },
+    async getText(url: string) { await pace(); return http.getText(url, { headers }); },
+    async postJson<T = unknown>(url: string, body: unknown) { await pace(); return http.postJson<T>(url, body, { headers }); },
+  };
+}
 
 export const COMPANIES: Company[] = [
   { name: 'Microsoft', ticker: 'MSFT', cik: 789019, capex: ['PaymentsToAcquirePropertyPlantAndEquipment'] },
@@ -154,12 +182,12 @@ export function pct(cur: number, prev: number): number {
   return ((cur - prev) / prev) * 100;
 }
 
-async function companyRow(http: Http, c: Company, headers: Record<string, string>): Promise<FilingRecord> {
+async function companyRow(http: Http, c: Company): Promise<FilingRecord> {
   let capex: AnnualValue[] = [];
   let lastErr = 'no annual 10-K facts';
   for (const concept of c.capex) {
     try {
-      capex = annualFacts(await http.getJson<ConceptResponse>(conceptUrl(c, concept), { headers }));
+      capex = annualFacts(await http.getJson<ConceptResponse>(conceptUrl(c, concept)));
       if (capex.length >= 2) break;
     } catch (e) {
       // Companies switch concepts over time; try the next one.
@@ -169,10 +197,10 @@ async function companyRow(http: Http, c: Company, headers: Record<string, string
   const [cur, prev] = capex;
   if (!cur) throw new Error(`${c.ticker}: capex unavailable (${lastErr})`);
 
-  const reports = annualReports(await http.getJson<Submissions>(submissionsUrl(c), { headers }), 2);
+  const reports = annualReports(await http.getJson<Submissions>(submissionsUrl(c)), 2);
   const heads: (number | null)[] = [];
   for (const r of reports) {
-    const html = await http.getText(docUrl(c, r.accession, r.doc), { headers });
+    const html = await http.getText(docUrl(c, r.accession, r.doc));
     heads.push(parseHeadcount(htmlToText(html)));
   }
   const [hc, hp] = heads;
@@ -210,19 +238,17 @@ export const edgar: RichSource = {
   id: 'edgar',
   tier: 2,
   cadence: 'weekly',
+  requiresEnv: 'SEC_USER_AGENT',
   async fetch(ctx) {
     return (await this.fetchRich(ctx)).metrics;
   },
   async fetchRich(ctx: FetchContext): Promise<SourceOutput> {
-    // SEC fair access: the User-Agent must name the requester and give a contact
-    // email, or data.sec.gov answers 403. SEC_USER_AGENT overrides the default.
-    const ua = ctx.env.SEC_USER_AGENT || DEFAULT_SEC_USER_AGENT;
-    const headers = { 'user-agent': ua, 'accept-encoding': 'gzip, deflate' };
+    const http = secHttp(ctx.http, ctx.env.SEC_USER_AGENT ?? '', Number(ctx.env.SEC_MIN_INTERVAL_MS ?? SEC_MIN_INTERVAL_MS));
     const rows: FilingRecord[] = [];
     const errors: string[] = [];
     for (const c of COMPANIES) {
       try {
-        rows.push(await companyRow(ctx.http, c, headers));
+        rows.push(await companyRow(http, c));
       } catch (e) {
         errors.push(e instanceof Error ? e.message : String(e));
       }
