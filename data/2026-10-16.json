@@ -1,0 +1,339 @@
+{
+  "date": "2026-10-16",
+  "revision": 0,
+  "weightsVersion": "v2",
+  "readiness": 28.1,
+  "projectedDate": "2031-01-01",
+  "confidence": 0.64,
+  "bandMonths": 22,
+  "sourceCoveragePct": 100,
+  "weightCovered": 1,
+  "subIndices": {
+    "labor_dislocation": 18.8,
+    "political_momentum": 28.3,
+    "public_opinion": 16,
+    "corporate_equity": 25.6,
+    "precedent": 56.6,
+    "fiscal_pressure": 41
+  },
+  "metrics": [
+    {
+      "metricId": "corporate.equity_commitments_usd",
+      "label": "Binding AI equity committed to a public fund",
+      "value": 0,
+      "unit": "USD",
+      "asOf": "2026-07-02",
+      "fetchedAt": "2026-10-16T00:00:00Z",
+      "sourceName": "TechCrunch / FT",
+      "sourceUrl": "https://techcrunch.com/2026/07/02/openai-proposed-donating-5-of-its-equity-to-a-us-sovereign-wealth-fund/",
+      "note": "$0 binding. 2 proposals tracked, none enforceable",
+      "sourceId": "corporate"
+    },
+    {
+      "metricId": "corporate.equity_pipeline_usd",
+      "label": "AI equity pipeline, discounted",
+      "value": 6390000000,
+      "unit": "USD",
+      "asOf": "2026-07-02",
+      "fetchedAt": "2026-10-16T00:00:00Z",
+      "sourceName": "TechCrunch / FT",
+      "sourceUrl": "https://techcrunch.com/2026/07/02/openai-proposed-donating-5-of-its-equity-to-a-us-sovereign-wealth-fund/",
+      "note": "OpenAI: floated, $43B × 0.15; White House: reported, unsized",
+      "sourceId": "corporate"
+    },
+    {
+      "metricId": "fiscal.deficit_pct_gdp",
+      "label": "Federal deficit, % of GDP",
+      "value": 5.77,
+      "unit": "% of GDP",
+      "asOf": "2025-01-01",
+      "fetchedAt": "2026-10-16T00:00:00Z",
+      "sourceName": "FRED FYFSGDA188S (OMB via St. Louis Fed)",
+      "sourceUrl": "https://fred.stlouisfed.org/series/FYFSGDA188S",
+      "note": "Fiscal year 2025",
+      "sourceId": "fred"
+    },
+    {
+      "metricId": "fiscal.interest_pct_receipts",
+      "label": "Interest outlays, % of receipts",
+      "value": 18.5,
+      "unit": "% of receipts",
+      "asOf": "2025-09-30",
+      "fetchedAt": "2026-10-16T00:00:00Z",
+      "sourceName": "FRED FYOINT / FYFR (OMB via St. Louis Fed)",
+      "sourceUrl": "https://fred.stlouisfed.org/series/FYOINT",
+      "note": "Fiscal year 2025: $970B interest on $5236B receipts",
+      "sourceId": "fred"
+    },
+    {
+      "metricId": "labor.ai_layoffs_ttm",
+      "label": "AI-attributed job cuts, trailing 12 mo",
+      "value": 157597,
+      "unit": "jobs",
+      "asOf": "2026-09-30",
+      "sourceName": "Challenger, Gray & Christmas, Sept 2026 report",
+      "sourceUrl": "https://www.challengergray.com/blog/job-cuts-fall-in-september-hiring-plans-up-3-over-2025-on-weak-early-seasonal-hiring/",
+      "note": "Derived: 120,136 cut YTD 2026 (21% of all cuts) plus Oct–Dec 2025",
+      "fetchedAt": "2026-10-16T00:00:00Z",
+      "sourceId": "challenger"
+    },
+    {
+      "metricId": "labor.ai_layoffs_ytd",
+      "label": "AI-attributed job cuts, 2026 to date",
+      "value": 120136,
+      "unit": "jobs",
+      "asOf": "2026-09-30",
+      "sourceName": "Challenger, Gray & Christmas, Sept 2026 report",
+      "sourceUrl": "https://www.challengergray.com/blog/job-cuts-fall-in-september-hiring-plans-up-3-over-2025-on-weak-early-seasonal-hiring/",
+      "note": "Jan–Sep 2026, employer cited AI. 21% of all announced cuts. Unscored: the trailing-12-month figure is the scored one",
+      "fetchedAt": "2026-10-16T00:00:00Z",
+      "sourceId": "challenger"
+    },
+    {
+      "metricId": "labor.payrolls_3mo_avg_change",
+      "label": "Payroll growth, 3-mo avg",
+      "value": 50.7,
+      "unit": "thousand jobs/mo",
+      "asOf": "2026-09-01",
+      "fetchedAt": "2026-10-16T00:00:00Z",
+      "sourceName": "BLS CES, series CES0000000001",
+      "sourceUrl": "https://data.bls.gov/timeseries/CES0000000001",
+      "note": "Latest month +29k (preliminary)",
+      "sourceId": "bls"
+    },
+    {
+      "metricId": "labor.unemployment_rate",
+      "label": "Unemployment rate",
+      "value": 4.2,
+      "unit": "%",
+      "asOf": "2026-09-01",
+      "fetchedAt": "2026-10-16T00:00:00Z",
+      "sourceName": "BLS CPS, series LNS14000000",
+      "sourceUrl": "https://data.bls.gov/timeseries/LNS14000000",
+      "note": "+0.1 pt vs prior month",
+      "sourceId": "bls"
+    },
+    {
+      "metricId": "labor.white_collar_openings_yoy",
+      "label": "Prof. & business services openings, YoY",
+      "value": 8.3,
+      "unit": "% YoY",
+      "asOf": "2026-08-01",
+      "fetchedAt": "2026-10-16T00:00:00Z",
+      "sourceName": "BLS JOLTS, series JTS540099000000000JOL",
+      "sourceUrl": "https://data.bls.gov/timeseries/JTS540099000000000JOL",
+      "note": "Proxy for entry-level white-collar postings",
+      "sourceId": "bls"
+    },
+    {
+      "metricId": "markets.passage_probability",
+      "label": "Market odds of federal household checks",
+      "value": 3.05,
+      "unit": "%",
+      "asOf": "2026-10-16",
+      "fetchedAt": "2026-10-16T00:00:00Z",
+      "sourceName": "Kalshi KXTARIFFCHECKS-26-27",
+      "sourceUrl": "https://kalshi.com/markets/kxtariffchecks",
+      "note": "Will it be reported that at least one million Americans have received checks of at least $1000 directly attributable to tariff revenue?",
+      "sourceId": "kalshi"
+    },
+    {
+      "metricId": "opinion.ubi_support_pct",
+      "label": "Support for a basic income, poll average",
+      "value": 37.2,
+      "unit": "%",
+      "asOf": "2026-07-06",
+      "fetchedAt": "2026-10-16T00:00:00Z",
+      "sourceName": "Weighted mean of 3 national polls",
+      "sourceUrl": "https://apnorc.org/projects/many-believe-poverty-and-homelessness-are-increasing-and-feel-the-government-has-a-responsibility-to-address-the-issues/",
+      "note": "AP-NORC 23%, Manhattan Institute 32% (right), Data for Progress 59% (left). Partisan sponsors at half weight",
+      "sourceId": "polling"
+    },
+    {
+      "metricId": "politics.ai_executive_actions_12mo",
+      "label": "Presidential documents citing AI, 12 mo",
+      "value": 16,
+      "unit": "documents",
+      "asOf": "2026-10-02",
+      "fetchedAt": "2026-10-16T00:00:00Z",
+      "sourceName": "Federal Register API",
+      "sourceUrl": "https://www.federalregister.gov/documents/search?conditions%5Bterm%5D=%22artificial+intelligence%22&conditions%5Btype%5D%5B%5D=PRESDOCU&conditions%5Bpublication_date%5D%5Bgte%5D=2025-10-16",
+      "note": "Latest: Inaugurating the Era of Super Intelligence",
+      "sourceId": "federal-register"
+    },
+    {
+      "metricId": "politics.bills_with_committee_movement",
+      "label": "Bills with committee movement",
+      "value": 0,
+      "unit": "bills",
+      "asOf": "2026-06-18",
+      "fetchedAt": "2026-10-16T00:00:00Z",
+      "sourceName": "Congress.gov actions, 2 watched bills",
+      "sourceUrl": "https://www.congress.gov/bill/119th-congress/house-bill/5830",
+      "note": "0 of 2 watched bills past referral",
+      "sourceId": "congress"
+    },
+    {
+      "metricId": "politics.cosponsors_total",
+      "label": "Co-sponsors, watched bills",
+      "value": 11,
+      "unit": "co-sponsors",
+      "asOf": "2026-06-18",
+      "fetchedAt": "2026-10-16T00:00:00Z",
+      "sourceName": "Congress.gov bill records",
+      "sourceUrl": "https://www.congress.gov/bill/119th-congress/house-bill/5830/cosponsors",
+      "note": "H.R. 5830: 11, S. 4825: 0",
+      "sourceId": "congress"
+    },
+    {
+      "metricId": "precedent.cash_disbursed_usd",
+      "label": "Guaranteed-income cash disbursed, cumulative",
+      "value": 335000000,
+      "unit": "USD",
+      "asOf": "2026-10-14",
+      "sourceName": "Guaranteed Income Pilots Dashboard",
+      "sourceUrl": "https://guaranteedincome.us/",
+      "note": "Maintainer figure. Dashboard lists 32 pilots but publishes no total we could confirm (unverified)",
+      "fetchedAt": "2026-10-16T00:00:00Z",
+      "sourceId": "pilots"
+    },
+    {
+      "metricId": "precedent.permanent_programs",
+      "label": "Permanent cash programs",
+      "value": 2,
+      "unit": "programs",
+      "asOf": "2026-09-18",
+      "fetchedAt": "2026-10-16T00:00:00Z",
+      "sourceName": "Alaska Department of Revenue (newest of 2)",
+      "sourceUrl": "https://dor.alaska.gov/department-of-revenue/news-detail/2026/09/28/department-of-revenue-announces-2026-permanent-fund-dividend-amount",
+      "note": "Alaska Permanent Fund Dividend; Cook County Promise Guaranteed Income",
+      "sourceId": "pilots"
+    },
+    {
+      "metricId": "precedent.recipients",
+      "label": "Guaranteed-income recipients, cumulative",
+      "value": 30000,
+      "unit": "people",
+      "asOf": "2026-10-14",
+      "sourceName": "Guaranteed Income Pilots Dashboard",
+      "sourceUrl": "https://guaranteedincome.us/",
+      "note": "Maintainer figure, not independently confirmed. Excludes Alaska PFD",
+      "fetchedAt": "2026-10-16T00:00:00Z",
+      "sourceId": "pilots"
+    }
+  ],
+  "sourcesOk": [
+    "bls",
+    "challenger",
+    "congress",
+    "corporate",
+    "federal-register",
+    "fred",
+    "kalshi",
+    "pilots",
+    "polling"
+  ],
+  "sourcesFailed": [],
+  "bills": [
+    {
+      "id": "s4825-119",
+      "title": "S. 4825 American A.I. Sovereign Wealth Fund Act",
+      "date": "2026-06-18",
+      "status": "in committee",
+      "cosponsors": 0,
+      "latestAction": "Read twice and referred to the Committee on Finance.",
+      "sourceUrl": "https://www.congress.gov/bill/119th-congress/senate-bill/4825",
+      "sourceName": "Congress.gov"
+    },
+    {
+      "id": "hr5830-119",
+      "title": "H.R. 5830 Guaranteed Income Pilot Program Act",
+      "date": "2025-10-24",
+      "status": "in committee",
+      "cosponsors": 11,
+      "latestAction": "Referred to the House Committee on Ways and Means.",
+      "sourceUrl": "https://www.congress.gov/bill/119th-congress/house-bill/5830",
+      "sourceName": "Congress.gov"
+    }
+  ],
+  "actors": [
+    {
+      "actor": "Executive branch",
+      "vehicle": "Inaugurating the Era of Super Intelligence",
+      "status": "Published 2026-10-02",
+      "signal": "neutral",
+      "asOf": "2026-10-02",
+      "sourceUrl": "https://www.federalregister.gov/documents/2026/10/02/2026-20321/inaugurating-the-era-of-super-intelligence",
+      "sourceName": "Federal Register 2026-20321"
+    },
+    {
+      "actor": "Sen. Bernie Sanders",
+      "vehicle": "S. 4825 American A.I. Sovereign Wealth Fund Act",
+      "status": "Referred to Senate Finance, Jun 18 2026",
+      "signal": "toward",
+      "asOf": "2026-06-18",
+      "sourceUrl": "https://www.congress.gov/bill/119th-congress/senate-bill/4825",
+      "sourceName": "Congress.gov"
+    },
+    {
+      "actor": "Rep. Bonnie Watson Coleman",
+      "vehicle": "H.R. 5830 Guaranteed Income Pilot Program Act ($495M)",
+      "status": "Referred to Ways and Means, 11 co-sponsors",
+      "signal": "toward",
+      "asOf": "2025-10-24",
+      "sourceUrl": "https://www.congress.gov/bill/119th-congress/house-bill/5830",
+      "sourceName": "Congress.gov"
+    },
+    {
+      "actor": "Sam Altman / OpenAI",
+      "vehicle": "5% of OpenAI equity to a US sovereign wealth fund",
+      "status": "Proposed, not binding",
+      "signal": "toward",
+      "asOf": "2026-07-02",
+      "sourceUrl": "https://techcrunch.com/2026/07/02/openai-proposed-donating-5-of-its-equity-to-a-us-sovereign-wealth-fund/",
+      "sourceName": "TechCrunch / FT"
+    },
+    {
+      "actor": "White House",
+      "vehicle": "Federal equity stake in OpenAI",
+      "status": "Talks reported",
+      "signal": "toward",
+      "asOf": "2026-06-05",
+      "sourceUrl": "https://www.cnbc.com/2026/06/05/trump-open-ai-altman-stake.html",
+      "sourceName": "CNBC"
+    },
+    {
+      "actor": "Cook County, IL",
+      "vehicle": "Permanent guaranteed income in FY2026 budget",
+      "status": "Enacted",
+      "signal": "toward",
+      "asOf": "2025-11-20",
+      "sourceUrl": "https://economicsecurityproject.org/news/cook-county-becomes-first-government-body-in-nation-to-make-guaranteed-income-permanent/",
+      "sourceName": "Economic Security Project"
+    },
+    {
+      "actor": "City of Denver",
+      "vehicle": "Denver Basic Income Project",
+      "status": "City declined further funding",
+      "signal": "away",
+      "asOf": "2026-05-05",
+      "sourceUrl": "https://www.denverbasicincomeproject.org/research",
+      "sourceName": "Denver Basic Income Project"
+    },
+    {
+      "actor": "State of Alaska",
+      "vehicle": "Permanent Fund Dividend 2026",
+      "status": "$1,200 paid from Oct 1 to ~600,000 residents",
+      "signal": "neutral",
+      "asOf": "2026-09-18",
+      "sourceUrl": "https://dor.alaska.gov/department-of-revenue/news-detail/2026/09/28/department-of-revenue-announces-2026-permanent-fund-dividend-amount",
+      "sourceName": "Alaska Department of Revenue"
+    }
+  ],
+  "filings": [],
+  "sourceErrors": {},
+  "sourcesSkipped": [
+    "edgar",
+    "legiscan"
+  ]
+}
