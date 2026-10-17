@@ -6,6 +6,8 @@ Open-source tracker of US readiness for an AI-funded citizen dividend. Read READ
 - `pnpm test` (vitest), `pnpm typecheck`, `pnpm lint`, `pnpm build` (Astro, static, root `web/`)
 - `pnpm snapshot [-- --date D --replay FILE --record FILE --revise --dry-run --weights v2]`
 - `pnpm scorecard` regenerates SCOREBOARD.md from predictions/ledger.json
+- `pnpm health` lists failed/skipped sources and curated files near expiry; the snapshot job mirrors it into one `pipeline-health` issue
+- `pnpm typecheck` runs `tsc` and `astro check`; CI runs lint, typecheck, test, build, check-site on every PR
 
 ## Non-negotiables
 1. Git is the database. No backend, no runtime API calls in the browser. The site reads `data/*.json` at build time.
@@ -31,4 +33,4 @@ Open-source tracker of US readiness for an AI-funded citizen dividend. Read READ
 4. Add its terms to DATA_LICENSE.md.
 
 ## Design tokens
-All in `web/src/styles/tokens.css`; never hardcode a colour or size. bg #06080b, pnl #0b0f15, bd #182030, grid #111720, fg #f4f7fb, mut #71829a, dim #3a4757, amb #ffb020 (the only brand accent), red #ff4a4a, cyn #38d2f2, grn #3ddc84. Readiness colour comes from `index/color.ts` only. Bimodal type scale: 9.5/10/12.5/14 for labels and body, 22/31/40/62 for figures. Weights 400/500 only, no shadows; the one gradient is the gap fill. Mono tabular numerals for figures. Motion only on data, once on load, frozen under prefers-reduced-motion.
+All in `web/src/styles/tokens.css`; never hardcode a colour or size. bg #06080b, pnl #0b0f15, bd #182030, grid #111720, fg #f4f7fb, mut #71829a, dim #3a4757, amb #ffb020 (the only brand accent), red #ff4a4a, cyn #38d2f2, grn #3ddc84. Readiness colour comes from `index/color.ts` only. Text is never `--dim` (2.1:1, fails WCAG AA); labels use `--mut`, and `--dim` is for rules, ticks and disabled controls. Bimodal type scale: 9.5/10/12.5/14 for labels and body, 22/31/40/62 for figures. Weights 400/500 only, no shadows; the one gradient is the gap fill. Mono tabular numerals for figures. Motion only on data, once on load, frozen under prefers-reduced-motion.

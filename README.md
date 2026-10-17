@@ -1,6 +1,13 @@
 <p align="center"><img src="docs/banner.svg" alt="The Trigger" width="100%"></p>
 
-**Live tracker:** https://destinjones.github.io/the-trigger · **What you'd get:** [/calculator](https://destinjones.github.io/the-trigger/calculator) · **What moved:** [/log](https://destinjones.github.io/the-trigger/log) ([RSS](https://destinjones.github.io/the-trigger/rss.xml)) · **Method and weaknesses:** [/method](https://destinjones.github.io/the-trigger/method) · **Our record:** [SCOREBOARD.md](SCOREBOARD.md)
+<p align="center">
+  <a href="https://destinjones.github.io/the-trigger/"><img src="https://destinjones.github.io/the-trigger/badge.svg" alt="Live readiness"></a>
+  <a href="https://github.com/destinjones/the-trigger/actions/workflows/ci.yml"><img src="https://github.com/destinjones/the-trigger/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://github.com/destinjones/the-trigger/actions/workflows/snapshot.yml"><img src="https://github.com/destinjones/the-trigger/actions/workflows/snapshot.yml/badge.svg" alt="Daily snapshot"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/code-MIT-3a4757" alt="MIT"></a>
+</p>
+
+**Live tracker:** https://destinjones.github.io/the-trigger · **What you'd get:** [/calculator](https://destinjones.github.io/the-trigger/calculator) · **What moved:** [/log](https://destinjones.github.io/the-trigger/log) ([RSS](https://destinjones.github.io/the-trigger/rss.xml)) · **Method and weaknesses:** [/method](https://destinjones.github.io/the-trigger/method) · **Data:** [/data](https://destinjones.github.io/the-trigger/data) · **Our record:** [SCOREBOARD.md](SCOREBOARD.md)
 
 **The layoffs started. The checks haven't.** The Trigger tracks how close the United States is to paying its citizens a dividend because AI is displacing work, and projects when the first federal check clears. It boils six sub-indices (labor dislocation, political momentum, public opinion, corporate equity, precedent and fiscal pressure) into one 0–100 readiness score and a projected date for the first federal AI dividend, always shown with its band and confidence. The thesis is blunt: checks do not arrive from goodwill, they arrive when consumer spending breaks. So the tracker watches the dislocation and the political response side by side, and treats the gap between them as the story. Every number links to the upstream record it came from, the weighting is a YAML file you can fork, and every projection is logged and graded.
 
@@ -15,6 +22,7 @@ pnpm install
 pnpm test          # model, sources (against recorded upstream responses), scorecard
 pnpm snapshot      # pull every source, write data/YYYY-MM-DD.json
 pnpm scorecard     # log the projection, regenerate SCOREBOARD.md
+pnpm health        # failed or skipped sources, curated files about to expire
 pnpm dev           # http://localhost:4321
 pnpm build         # static site in web/dist
 ```
@@ -38,7 +46,8 @@ pnpm snapshot -- --date 2026-10-14 --replay fixtures/cassettes/2026-10-14.json -
 | Hand-curated sources with no API (Challenger, polls, pilots) | [`sources/curated/`](sources/curated) |
 | Daily snapshots: git history is the time series | [`data/`](data) |
 | Prediction ledger | [`predictions/ledger.json`](predictions/ledger.json) |
-| Daily job | [`.github/workflows/snapshot.yml`](.github/workflows/snapshot.yml) |
+| Daily job, and the `pipeline-health` issue it keeps current | [`.github/workflows/snapshot.yml`](.github/workflows/snapshot.yml) |
+| Static JSON for anyone to reuse | [`/api/latest.json`](https://destinjones.github.io/the-trigger/api/latest.json), [`/api/history.json`](https://destinjones.github.io/the-trigger/api/history.json) |
 
 Design rules: git is the database (no backend, nothing fetched in the browser); past snapshots are never rewritten, corrections are new revisions; no number without a source link; the model is deterministic and never reads the clock; the index is arguable, so weights live in data, not code.
 
@@ -52,7 +61,9 @@ Disagree with an anchor instead (say, 9% unemployment as "trigger pulled")? Edit
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md): fixing a curated value or adding a poll takes one YAML edit.
+See [CONTRIBUTING.md](CONTRIBUTING.md): fixing a curated value or adding a poll takes one YAML edit. Issues labelled [good first issue](https://github.com/destinjones/the-trigger/labels/good%20first%20issue) are scoped for a first pull request. Changes are listed in [CHANGELOG.md](CHANGELOG.md); please read the [code of conduct](CODE_OF_CONDUCT.md), and report security problems privately ([SECURITY.md](SECURITY.md)).
+
+If you use the data, cite it with [CITATION.cff](CITATION.cff) and the snapshot date.
 
 ## Sources
 
@@ -68,7 +79,6 @@ Tier 1: BLS, Congress.gov, FRED, Federal Register (GovTrack retired 2026-10-15 a
 - Anthropic Economic Index task-exposure source
 - Polymarket alongside Kalshi
 - Email or RSS alerts on threshold crossings
-- Public read API (the JSON in `data/` is already one, via raw GitHub URLs)
 - Accounts, a database, i18n, mobile app: not planned unless there is a reason
 
 ## License

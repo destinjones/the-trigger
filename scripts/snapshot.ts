@@ -2,7 +2,7 @@
  * pnpm snapshot [-- options]
  *
  *   --date YYYY-MM-DD   snapshot date (default: today, UTC)
- *   --weights v1        weights version to score with (default: v1)
+ *   --weights vN        weights version to score with (default: v2)
  *   --record FILE       live run, and save every HTTP response to a cassette
  *   --replay FILE       build from a cassette instead of the network
  *   --revise            allow writing a new revision of a past date

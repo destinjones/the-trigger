@@ -1,0 +1,15 @@
+---
+import Base from '../layouts/Base.astro';
+import { latest } from '../lib/data.ts';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+<Base title="Not found: The Trigger" description="This page does not exist. The tracker, the method and every snapshot are linked below." page="other">
+  <section class="headline">
+    <h1>Not found. <span>The index is still at {latest.readiness.toFixed(1)}.</span></h1>
+    <p class="lede">
+      There is no page at this address. Try the <a href={`${base}/`}>tracker</a>, the <a href={`${base}/method`}>method</a>,
+      or the <a href={`${base}/data`}>raw data</a>.
+    </p>
+  </section>
+</Base>

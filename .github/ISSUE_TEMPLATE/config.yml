@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Security problem
+    url: https://github.com/destinjones/the-trigger/security/advisories/new
+    about: Report privately. Please do not open a public issue.
+  - name: How the score is computed
+    url: https://destinjones.github.io/the-trigger/method
+    about: Read the method and its known weaknesses first.

@@ -1,11 +1,16 @@
 ---
+// Fonts are self-hosted (latin subset, the two weights the design uses): no third-party request from the browser.
+import '@fontsource/ibm-plex-mono/latin-400.css';
+import '@fontsource/ibm-plex-mono/latin-500.css';
+import '@fontsource/ibm-plex-sans/latin-400.css';
+import '@fontsource/ibm-plex-sans/latin-500.css';
 import '../styles/global.css';
 import { REPO_URL, latest, weightsPath } from '../lib/data.ts';
 
 interface Props {
   title: string;
   description: string;
-  page: 'index' | 'method' | 'calculator' | 'log' | 'move';
+  page: 'index' | 'method' | 'calculator' | 'log' | 'move' | 'map' | 'data' | 'other';
 }
 const { title, description, page } = Astro.props;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
@@ -38,11 +43,10 @@ const ogImage = `${site}${base}/og.png`;
     <meta name="twitter:image" content={ogImage} />
     <link rel="alternate" type="application/rss+xml" title="The Trigger: what moved" href={`${site}${base}/rss.xml`} />
     <link rel="icon" href={`${base}/favicon.svg`} type="image/svg+xml" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet" />
+    <meta name="theme-color" content="#06080b" />
   </head>
   <body>
+    <a class="skip" href="#main">Skip to content</a>
     <header class="topbar">
       <div class="wrap">
         <a class="brand" href={`${base}/`}>THE TRIGGER<span>_</span></a>
@@ -58,7 +62,7 @@ const ogImage = `${site}${base}/og.png`;
       </div>
     </header>
     <slot name="wire" />
-    <main class="wrap">
+    <main class="wrap" id="main">
       <slot />
     </main>
     <footer class="site">
@@ -68,6 +72,7 @@ const ogImage = `${site}${base}/og.png`;
         <a href={`${REPO_URL}/blob/main/WEIGHTS.md`}>Weights changelog</a>
         <a href={`${REPO_URL}/blob/main/SCOREBOARD.md`}>Our prediction record</a>
         <a href={`${REPO_URL}/blob/main/DATA_LICENSE.md`}>Data sources and terms</a>
+        <a href={`${base}/data`}>Data and JSON endpoints</a>
         <a href={`${REPO_URL}/commits/main/data`}>Every snapshot (git history)</a>
         <span>Not financial or policy advice. Code MIT.</span>
       </div>

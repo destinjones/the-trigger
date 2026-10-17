@@ -6,6 +6,7 @@
 import type { Snapshot } from '../../../scripts/lib/run.ts';
 import type { SourceResult } from '../../../sources/_types.ts';
 import { parseWeights } from '../../../index/model.ts';
+import type { Ledger } from '../../../scripts/lib/scorecard.ts';
 import ledgerJson from '../../../predictions/ledger.json';
 
 export type { Snapshot };
@@ -53,18 +54,8 @@ export function series(pick: (s: Snapshot) => number | null | undefined): { date
     .filter((p): p is { date: string; value: number } => typeof p.value === 'number' && Number.isFinite(p.value));
 }
 
-export interface Prediction {
-  id: string;
-  madeOn: string;
-  claim: string;
-  resolvesBy: string;
-  confidence: number;
-  status: 'open' | 'hit' | 'miss';
-  resolvedOn?: string | null;
-  evidenceUrl?: string | null;
-  weightsVersion?: string;
-}
-export const ledger = ledgerJson as { predictions: Prediction[] };
+export type { Prediction } from '../../../scripts/lib/scorecard.ts';
+export const ledger = ledgerJson as Ledger;
 
 /** Monthly AI-attributed cuts from the curated Challenger file, for the gap chart. */
 import challengerText from '../../../sources/curated/challenger.yaml?raw';
