@@ -12,7 +12,7 @@ export interface SubIndexProps {
 }
 
 export default function SubIndex({ label, value, weight, metricCount, citeHref, methodHref }: SubIndexProps) {
-  const color = scoreColor(value);
+  const color = value === null ? 'var(--dim)' : scoreColor(value);
   return (
     <div class="subindex">
       <div class="subindex-head">

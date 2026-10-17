@@ -247,6 +247,7 @@ const projectionWindow = currentProjection.window;
   <section class="two-col">
     <div class="panel">
       <div class="panel-head"><h2>Open predictions</h2><SourceCite href={fileUrl('predictions/ledger.json')} name="ledger" /></div>
+      <div class="table-wrap">
       <table class="table">
         <thead><tr><th>Made</th><th>Claim</th><th>Conf.</th></tr></thead>
         <tbody>
@@ -266,6 +267,7 @@ const projectionWindow = currentProjection.window;
           ))}
         </tbody>
       </table>
+      </div>
       <p class="small muted" style="margin-top:8px">Every projection is logged and graded. <a href={fileUrl('SCOREBOARD.md')}>Scoreboard</a>.</p>
     </div>
     <div class="panel">

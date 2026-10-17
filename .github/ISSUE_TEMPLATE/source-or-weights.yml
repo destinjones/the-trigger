@@ -1,0 +1,24 @@
+name: Source or weighting proposal
+description: Propose a new source, a new metric, or a change to the weights.
+labels: [method]
+body:
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind
+      options: [New source, New metric from an existing source, Change to weights or anchors]
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: What, and which sub-index it should feed. For a source, link its API or the page values would be curated from, and its terms of use.
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it makes the index more accurate
+    validations:
+      required: true

@@ -25,6 +25,17 @@ export default tseslint.config(
         { object: 'Math', property: 'random', message: 'The model is deterministic.' },
       ],
       'no-restricted-globals': ['error', { name: 'fetch', message: 'The model does no I/O.' }],
+      'no-restricted-syntax': ['error', { selector: "NewExpression[callee.name='Date'][arguments.length=0]", message: 'The model is pure. Pass the date in.' }],
+    },
+  },
+  {
+    // Sources go through ctx.http (recordable, replayable) and ctx.today (never the clock).
+    files: ['sources/**/*.ts'],
+    ignores: ['sources/_http.ts', 'sources/**/*.test.ts'],
+    rules: {
+      'no-restricted-globals': ['error', { name: 'fetch', message: 'Use ctx.http so runs can be recorded and replayed.' }],
+      'no-restricted-properties': ['error', { object: 'Date', property: 'now', message: 'Use ctx.today.' }],
+      'no-restricted-syntax': ['error', { selector: "NewExpression[callee.name='Date'][arguments.length=0]", message: 'Use ctx.today.' }],
     },
   },
 );

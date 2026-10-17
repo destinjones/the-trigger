@@ -24,6 +24,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
 
 concurrency:
   group: snapshot
@@ -70,3 +71,24 @@ jobs:
           R=$(node -p "require('./data/$D.json').readiness")
           git commit -m "snapshot $D: readiness $R"
           git push
+
+      # One open issue labelled pipeline-health carries whatever needs a person:
+      # failed sources, skipped sources, curated files about to expire, a stalled
+      # job. Its body is replaced on every run; it closes when a run is clean.
+      - name: Report pipeline health
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          pnpm --silent health --out health.md | tee -a "$GITHUB_STEP_SUMMARY"
+          N=$(gh issue list --label pipeline-health --state open --json number -q '.[0].number')
+          if [ -s health.md ]; then
+            if [ -n "$N" ]; then
+              gh issue edit "$N" --body-file health.md
+            else
+              gh label create pipeline-health --color B60205 --description "Opened and closed by the snapshot job" 2>/dev/null || true
+              gh issue create --title "Pipeline health: action needed" --label pipeline-health --body-file health.md
+            fi
+          elif [ -n "$N" ]; then
+            gh issue close "$N" --comment "The snapshot run came back clean."
+          fi

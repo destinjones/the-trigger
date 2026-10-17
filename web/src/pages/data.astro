@@ -1,0 +1,60 @@
+---
+import Base from '../layouts/Base.astro';
+import { REPO_URL, fileUrl, historyUrl, latest, snapshots } from '../lib/data.ts';
+import { fmtDate } from '../lib/format.ts';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const site = (Astro.site?.toString() ?? '').replace(/\/$/, '');
+const raw = REPO_URL.replace('https://github.com/', 'https://raw.githubusercontent.com/');
+const first = snapshots[0]?.date ?? latest.date;
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Dataset',
+  name: 'The Trigger: US AI dividend readiness index',
+  description: 'Daily snapshots of a 0-100 composite score of how close the United States is to paying citizens a dividend because AI is displacing work, with every input value, its unit, observation date and a deep link to the upstream record.',
+  url: `${site}${base}/data`,
+  sameAs: REPO_URL,
+  license: fileUrl('DATA_LICENSE.md'),
+  isAccessibleForFree: true,
+  temporalCoverage: `${first}/..`,
+  spatialCoverage: 'United States',
+  creator: { '@type': 'Organization', name: 'The Trigger contributors', url: REPO_URL },
+  distribution: [
+    { '@type': 'DataDownload', encodingFormat: 'application/json', contentUrl: `${site}${base}/api/latest.json` },
+    { '@type': 'DataDownload', encodingFormat: 'application/json', contentUrl: `${site}${base}/api/history.json` },
+  ],
+};
+---
+<Base title="Data: The Trigger" description="Every snapshot behind the AI dividend readiness index, as static JSON. No key, no rate limit, no runtime API." page="data">
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  <section class="headline">
+    <h1>The data. <span>All of it, as files.</span></h1>
+    <p class="lede">
+      There is no server. Every number on this site comes from a JSON file committed to git once a day, and the same files
+      are published here. Use them for anything the upstream terms allow; see <a href={fileUrl('DATA_LICENSE.md')}>DATA_LICENSE.md</a>.
+    </p>
+  </section>
+
+  <section class="panel prose">
+    <h2>Endpoints</h2>
+    <div class="table-wrap">
+      <table class="table">
+        <thead><tr><th>URL</th><th>What it is</th></tr></thead>
+        <tbody>
+          <tr><td><a href={`${base}/api/latest.json`}><code>/api/latest.json</code></a></td><td>The newest snapshot ({fmtDate(latest.date)}, revision {latest.revision}): score, projection, sub-indices, every metric with its source link, bills, actors, filings, source status.</td></tr>
+          <tr><td><a href={`${base}/api/history.json`}><code>/api/history.json</code></a></td><td>One row per day ({snapshots.length} so far): readiness, projected date, confidence, band, sub-indices.</td></tr>
+          <tr><td><a href={`${base}/badge.svg`}><code>/badge.svg</code></a></td><td>Live readiness badge for a README or a blog post.</td></tr>
+          <tr><td><a href={`${base}/rss.xml`}><code>/rss.xml</code></a></td><td>The weekly "what moved" log.</td></tr>
+          <tr><td><a href={`${raw}/main/data/${latest.date}.json`}><code>raw.githubusercontent.com/…/data/DATE.json</code></a></td><td>Any single day, straight from git. Past files are never rewritten; a correction is a new commit with a higher <code>revision</code>.</td></tr>
+          <tr><td><a href={historyUrl('data')}><code>git log data/</code></a></td><td>Every revision of every snapshot, with the commit that made it.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>
+      Field definitions are the TypeScript types in <a href={fileUrl('sources/_types.ts')}>sources/_types.ts</a> and
+      <a href={fileUrl('scripts/lib/run.ts')}>scripts/lib/run.ts</a>. The endpoints update when the site deploys after each daily snapshot.
+    </p>
+    <p>Embed the badge:</p>
+    <pre tabindex="0"><code>{`<a href="${site}${base}/"><img src="${site}${base}/badge.svg" alt="AI dividend readiness"></a>`}</code></pre>
+  </section>
+</Base>

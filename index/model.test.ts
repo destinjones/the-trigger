@@ -164,6 +164,7 @@ describe('computeComposite', () => {
     version: 't',
     subIndices: { a: { weight: 0.75, label: 'A' }, b: { weight: 0.25, label: 'B' } },
     metrics: { 'labor.unemployment_rate': 'a', 'labor.ai_layoffs_ttm': 'a', 'opinion.ubi_support_pct': 'b', 'markets.passage_probability': null },
+    coverage: { countSkipped: false },
   };
 
   it('means within, weights across', () => {
@@ -216,6 +217,17 @@ describe('buildSnapshot', () => {
     expect(s.subIndices.public_opinion).toBeCloseTo(33.3, 1);
     expect(s.subIndices.precedent).toBeNull();
     expect(Number.isInteger(s.readiness * 10)).toBe(true);
+  });
+  it('counts skipped sources against coverage only when the weights say so', () => {
+    const input = {
+      date: '2026-10-14', revision: 0, metrics: [m('labor.unemployment_rate', 4.2)],
+      sourcesOk: ['bls', 'polling', 'fred'], sourcesFailed: [], sourcesSkipped: ['edgar'],
+    };
+    expect(buildSnapshot({ ...input, weights: W }).sourceCoveragePct).toBe(100);
+    expect(buildSnapshot({ ...input, weights: { ...W, coverage: { countSkipped: true } } }).sourceCoveragePct).toBe(75);
+  });
+  it('rejects a malformed coverage block', () => {
+    expect(() => parseWeights('version: x\nsubIndices: { a: { weight: 1 } }\ncoverage: { countSkipped: yes please }')).toThrow(/countSkipped/);
   });
   it('sourceCoverage', () => {
     expect(sourceCoverage([], [])).toBe(0);

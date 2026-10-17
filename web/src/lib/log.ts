@@ -118,3 +118,33 @@ export function weeklyLog(snapshots: Snapshot[]): LogEntry[] {
   });
   return entries.reverse();
 }
+
+export interface DailyEntry {
+  date: string;
+  /** Date of the previous snapshot; null for the first one. */
+  since: string | null;
+  changes: Change[];
+  summary: string;
+  /** Nothing moved: no score, input, source or bill change. */
+  quiet: boolean;
+}
+
+/** One entry per snapshot date against the snapshot before it. Newest first; `snapshots` sorted oldest first. */
+export function dailyLog(snapshots: Snapshot[]): DailyEntry[] {
+  const out: DailyEntry[] = snapshots.map((cur, i) => {
+    const prev = i > 0 ? snapshots[i - 1] ?? null : null;
+    if (!prev) {
+      return {
+        date: cur.date, since: null, quiet: false,
+        changes: [{ kind: 'score', text: `First snapshot. Readiness ${cur.readiness.toFixed(1)}, first federal check projected ${cur.projectedDate} ±${cur.bandMonths} months.` }],
+        summary: `First snapshot: readiness ${cur.readiness.toFixed(1)}.`,
+      };
+    }
+    const changes = diffSnapshots(prev, cur);
+    if (prev.confidence !== cur.confidence) {
+      changes.push({ kind: 'score', text: `Confidence ${Math.round(prev.confidence * 100)}% → ${Math.round(cur.confidence * 100)}%.` });
+    }
+    return { date: cur.date, since: prev.date, changes, summary: summarize(changes, cur), quiet: changes.length === 0 };
+  });
+  return out.reverse();
+}

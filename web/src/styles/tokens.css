@@ -16,5 +16,5 @@
   --ls-label: .17em;
   color-scheme: dark;
 }
-.lbl { font-family: var(--f-mono); font-size: var(--t-label); color: var(--dim); letter-spacing: var(--ls-label); text-transform: uppercase; }
+.lbl { font-family: var(--f-mono); font-size: var(--t-label); color: var(--mut); letter-spacing: var(--ls-label); text-transform: uppercase; }
 .num { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
