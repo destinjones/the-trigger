@@ -22,6 +22,11 @@ export interface Weights {
   subIndices: Record<string, SubIndexDef>;
   /** metricId -> sub-index key, or null for recorded-but-unscored. */
   metrics: Record<string, string | null>;
+  /**
+   * How the confidence term counts sources. `countSkipped: true` (v3 on) treats a
+   * source skipped for a missing key as missing data; earlier versions left it out.
+   */
+  coverage: { countSkipped: boolean };
 }
 
 /** Parse and validate a weights YAML document. Throws with a precise message on any violation. */
@@ -59,7 +64,11 @@ export function parseWeights(yamlText: string): Weights {
     }
     metrics[metricId] = target as string | null;
   }
-  return { version: doc.version, subIndices, metrics };
+  const covRaw = doc.coverage as Record<string, unknown> | undefined;
+  if (covRaw !== undefined && (typeof covRaw !== 'object' || covRaw === null || typeof covRaw.countSkipped !== 'boolean')) {
+    throw new Error('weights: `coverage` must be a mapping with a boolean `countSkipped`');
+  }
+  return { version: doc.version, subIndices, metrics, coverage: { countSkipped: covRaw?.countSkipped === true } };
 }
 
 // ── Composite ──────────────────────────────────────────────────────────────
@@ -214,6 +223,8 @@ export interface SnapshotInput {
   metrics: SourceResult[];
   sourcesOk: string[];
   sourcesFailed: string[];
+  /** Sources not run because a required key was not configured. */
+  sourcesSkipped?: string[];
 }
 
 export interface SnapshotCore {
@@ -240,7 +251,10 @@ export function sourceCoverage(ok: readonly string[], failed: readonly string[])
 
 export function buildSnapshot(input: SnapshotInput): SnapshotCore {
   const comp = computeComposite(input.metrics, input.weights);
-  const coverage = sourceCoverage(input.sourcesOk, input.sourcesFailed);
+  const missing = input.weights.coverage.countSkipped
+    ? [...input.sourcesFailed, ...(input.sourcesSkipped ?? [])]
+    : input.sourcesFailed;
+  const coverage = sourceCoverage(input.sourcesOk, missing);
   const readiness = round(comp.readiness, 1);
   const proj = project(readiness, coverage, input.date);
   const subIndices: Record<string, number | null> = {};

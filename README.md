@@ -39,7 +39,7 @@ pnpm snapshot -- --date 2026-10-14 --replay fixtures/cassettes/2026-10-14.json -
 
 | Piece | Where |
 |---|---|
-| Weighting, with a comment on every line | [`index/weights.v2.yaml`](index/weights.v2.yaml) (default; [v1](index/weights.v1.yaml) still runs). Every change and why: [WEIGHTS.md](WEIGHTS.md) |
+| Weighting, with a comment on every line | [`index/weights.v3.yaml`](index/weights.v3.yaml) (default; [v1](index/weights.v1.yaml) and [v2](index/weights.v2.yaml) still run). Every change and why: [WEIGHTS.md](WEIGHTS.md) |
 | Per-metric 0–100 transforms and their reasoning | [`index/normalize.ts`](index/normalize.ts) |
 | Composite and projection (pure, tested) | [`index/model.ts`](index/model.ts) |
 | One module per source, one interface | [`sources/`](sources) |
@@ -53,8 +53,8 @@ Design rules: git is the database (no backend, nothing fetched in the browser); 
 
 ## Argue with the index
 
-1. Copy `index/weights.v2.yaml` to `weights.v3.yaml` and change what you disagree with. Say why in the comments.
-2. `pnpm snapshot -- --weights v3 --dry-run` to see your score and date.
+1. Copy `index/weights.v3.yaml` to `weights.v4.yaml` and change what you disagree with. Say why in the comments.
+2. `pnpm snapshot -- --weights v4 --dry-run` to see your score and date.
 3. Open a pull request with the result.
 
 Disagree with an anchor instead (say, 9% unemployment as "trigger pulled")? Edit `index/normalize.ts`; the tests tell you what moved.

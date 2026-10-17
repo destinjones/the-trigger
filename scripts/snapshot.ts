@@ -2,7 +2,7 @@
  * pnpm snapshot [-- options]
  *
  *   --date YYYY-MM-DD   snapshot date (default: today, UTC)
- *   --weights vN        weights version to score with (default: v2)
+ *   --weights vN        weights version to score with (default: the newest index/weights.v*.yaml)
  *   --record FILE       live run, and save every HTTP response to a cassette
  *   --replay FILE       build from a cassette instead of the network
  *   --revise            allow writing a new revision of a past date
@@ -24,15 +24,29 @@ const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const DATA = join(ROOT, 'data');
 
 const { values: args } = parseArgs({
+  // `pnpm snapshot -- --date D` forwards the `--`; drop it so the documented form works.
+  args: process.argv.slice(2).filter((a) => a !== '--'),
   options: {
     date: { type: 'string' },
-    weights: { type: 'string', default: 'v2' },
+    weights: { type: 'string' },
     record: { type: 'string' },
     replay: { type: 'string' },
     revise: { type: 'boolean', default: false },
     'dry-run': { type: 'boolean', default: false },
   },
 });
+
+/** Newest published weights version, so adopting a new version is one new file and no code change. */
+export function newestWeights(dir = join(ROOT, 'index')): string {
+  const v = readdirSync(dir)
+    .map((f) => /^weights\.v(\d+)\.yaml$/.exec(f)?.[1])
+    .filter((n): n is string => n !== undefined)
+    .map(Number)
+    .sort((a, b) => a - b)
+    .at(-1);
+  if (v === undefined) throw new Error('no index/weights.v*.yaml');
+  return `v${v}`;
+}
 
 const date = args.date ?? new Date().toISOString().slice(0, 10);
 if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) throw new Error(`--date must be YYYY-MM-DD, got ${date}`);
@@ -47,7 +61,7 @@ function readSnapshot(file: string): Snapshot {
 }
 
 async function main(): Promise<void> {
-  const weights = parseWeights(readFileSync(join(ROOT, 'index', `weights.${args.weights}.yaml`), 'utf8'));
+  const weights = parseWeights(readFileSync(join(ROOT, 'index', `weights.${args.weights ?? newestWeights()}.yaml`), 'utf8'));
   const files = listSnapshots();
   const target = `${date}.json`;
   const existing = files.includes(target) ? readSnapshot(target) : null;

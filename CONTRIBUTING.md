@@ -30,10 +30,10 @@ pnpm dev                # site at http://localhost:4321
 4. **Add an event** to `index/events.yaml` for the "what would move it" page.
    It needs a checkable condition, the raw metric values it would change, and a
    `watch` link where anyone can see whether it happened.
-5. **Argue with the weights.** Copy `index/weights.v2.yaml` to
-   `weights.v3.yaml`, change what you disagree with, explain why in comments,
+5. **Argue with the weights.** Copy `index/weights.v3.yaml` to
+   `weights.v4.yaml`, change what you disagree with, explain why in comments,
    and include the readiness and date your version produces
-   (`pnpm snapshot -- --replay ... --dry-run --weights v3`). Never edit a
+   (`pnpm snapshot -- --replay ... --dry-run --weights v4`). Never edit a
    published weights file.
 6. **Add a source.** Follow "Adding a source" in CLAUDE.md: implement `Source`,
    use `ctx.http` and `ctx.today`, add a transform with a comment in

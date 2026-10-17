@@ -35,7 +35,7 @@ const fixture = project(34, 88, '2026-10-14');
     <h2 id="weights">Weighting</h2>
     <p>
       The weights are an editorial judgment, kept in <a href={fileUrl(weightsPath)}>{weightsPath}</a> with a
-      comment on each line. Published versions are never edited; v1 stays in the repo and still runs. The model contains no weights of its own. To argue with them, copy the file to a new version,
+      comment on each line. Published versions are never edited; every earlier version stays in the repo and still runs. The model contains no weights of its own. To argue with them, copy the file to a new version,
       change it, run <code>pnpm snapshot</code>, and open a pull request with the score your weights produce.
     </p>
     <div class="table-wrap">
@@ -59,8 +59,10 @@ const fixture = project(34, 88, '2026-10-14');
       that was fed (<code>weightCovered</code>, now {Math.round(latest.weightCovered * 100)}%).
     </p>
 
-    <h3 id="changelog">Weights changelog: v1 to v2</h3>
-    <p>The only reweighting so far. Same inputs scored <span class="num">25.7</span> under v1 <SourceCite href={`${REPO_URL}/blob/80ca01b/data/2026-10-14.json`} name="r2, v1" /> and <span class="num">28.1</span> under v2 <SourceCite href={`${REPO_URL}/blob/8326a8a/data/2026-10-14.json`} name="r3, v2" />. Every version, every revision of the first snapshot, and the rationale are in <a href={fileUrl('WEIGHTS.md')}>WEIGHTS.md</a>.</p>
+    <h3 id="changelog">Weights changelog</h3>
+    <p><b>v2 to v3.</b> Same weights. Confidence now counts sources skipped for a missing key as missing data, which took it from 64% to 55% on unchanged readiness. Under v2, retiring a dead feed and leaving a key unset had raised confidence.</p>
+    <p><b>v1 to v2.</b>
+    The only reweighting so far. Same inputs scored <span class="num">25.7</span> under v1 <SourceCite href={`${REPO_URL}/blob/80ca01b/data/2026-10-14.json`} name="r2, v1" /> and <span class="num">28.1</span> under v2 <SourceCite href={`${REPO_URL}/blob/8326a8a/data/2026-10-14.json`} name="r3, v2" />. Every version, every revision of the first snapshot, and the rationale are in <a href={fileUrl('WEIGHTS.md')}>WEIGHTS.md</a>.</p>
     <ul>
       <li><b>Fiscal pressure 0.15 → 0.05.</b> The deficit says whether the government is stretched, not whether AI is displacing anyone, and its sign is ambiguous. In v1 it carried as much weight as public opinion.</li>
       <li><b>Labor dislocation 0.25 → 0.30.</b> It is the thesis.</li>
@@ -161,7 +163,7 @@ bandMonths    = (100 − readiness) / 100 × ${PROJECTION.maxBandMonths}`}</pre>
     <p>
       When a source fails, its last known values are carried into the new snapshot marked <code>stale</code> (dashed
       card on the tracker), the failure is listed in <code>sourcesFailed</code> with its error, and confidence drops through
-      the coverage term. A source that needs an API key nobody configured is skipped, and does not count against coverage.
+      the coverage term. A source that needs an API key nobody configured is skipped; since weights v3 a skipped source also counts against coverage, because a missing key is missing data.
       Terms for each source are in <a href={fileUrl('DATA_LICENSE.md')}>DATA_LICENSE.md</a>.
     </p>
 

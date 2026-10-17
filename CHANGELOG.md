@@ -6,6 +6,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Ver
 
 ## [Unreleased]
 
+### Model
+- Weights v3 is the default. Same weights as v2; confidence now counts sources skipped for a missing key as missing data. Confidence on current inputs goes from 64% to 55%; readiness and the projected date are unchanged. See [WEIGHTS.md](WEIGHTS.md).
+- `pnpm snapshot` defaults to the newest `index/weights.v*.yaml` instead of a version named in code, and accepts the documented `pnpm snapshot -- --flag` form (the `--` used to be rejected).
+
 ### Added
 - `/data` page and static JSON endpoints: `/api/latest.json` (newest snapshot) and `/api/history.json` (one row per day). Dataset metadata (schema.org) for search engines.
 - `sitemap.xml`, `robots.txt`, a 404 page, a skip-to-content link and visible keyboard focus.

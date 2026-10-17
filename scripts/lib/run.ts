@@ -100,6 +100,7 @@ export function assemble(date: string, revision: number, weights: Weights, run: 
     metrics: run.metrics,
     sourcesOk: run.ok,
     sourcesFailed: run.failed,
+    sourcesSkipped: run.skipped,
   });
   return {
     ...core,

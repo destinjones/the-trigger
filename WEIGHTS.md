@@ -2,7 +2,7 @@
 
 The weights are the index's whole opinion. They live in `index/weights.v*.yaml`; a published version is never edited, and every version stays runnable (`pnpm snapshot -- --weights v1`). This file records each version, what moved, and why. The snapshot records which version scored it (`weightsVersion`).
 
-There have been two versions. The default is **v2**.
+There have been three versions. The default is **v3**, which keeps v2's weights and changes how confidence counts sources.
 
 | Sub-index | v1 | v2 | Why it moved |
 | --- | --- | --- | --- |
@@ -13,7 +13,13 @@ There have been two versions. The default is **v2**.
 | Precedent | 0.15 | 0.15 | Unchanged. |
 | Fiscal pressure | 0.15 | **0.05** | The deficit says whether government is stretched, not whether AI is displacing anyone, and its sign is ambiguous. In v1 it outweighed corporate equity. |
 
-## Effect on the score
+## v3: skipped sources count against confidence
+
+v3 has the same weights as v2. It adds `coverage.countSkipped: true`: the confidence term now counts a source skipped for a missing key (EDGAR without `SEC_USER_AGENT`, LegiScan without a key) as missing data. Under v2 a skipped source dropped out of the count entirely, so on 2026-10-15, retiring GovTrack and skipping EDGAR raised confidence from 55% to 64% with no new information.
+
+Same inputs, 2026-10-16: readiness **28.1** and the projected date (2031-01-01, ±22 months) are unchanged under both; source coverage goes from 100% to 81.8% and confidence from **64%** to **55%**. The new projection is appended to the ledger; the 64% entry stays and is still graded.
+
+## Effect on the score (v1 to v2)
 
 Same inputs, 2026-10-14: v1 scored **25.7** (first check 2031-03-12, ±22 months, 54% confidence); v2 scores **28.1** (2031-01-01, ±22 months, 55%). The full rationale is in the header comment of `index/weights.v2.yaml`.
 
@@ -33,6 +39,6 @@ Eight revisions of the first day's snapshot are in git. Only one of them changed
 
 Each projection in `predictions/ledger.json` records the weights version it was made with. When a revision changes the projection, the new one is appended and the old one stays in the ledger and is still graded. The site shows the newest projection, and the build fails if the dial and the ledger disagree.
 
-## Proposing a v3
+## Proposing a v4
 
-Copy `index/weights.v2.yaml` to `weights.v3.yaml`, change the numbers with a comment on each line, add a row to the table above, run `pnpm test` and `pnpm snapshot -- --weights v3 --dry-run`, and open a pull request with the score your weights produce. See CONTRIBUTING.md.
+Copy `index/weights.v3.yaml` to `weights.v4.yaml`, change the numbers with a comment on each line, add a row to the table above, run `pnpm test` and `pnpm snapshot -- --weights v4 --dry-run`, and open a pull request with the score your weights produce. See CONTRIBUTING.md.

@@ -1,0 +1,77 @@
+# v3 — 2026-10-17. Supersedes v2 as the default. v1 and v2 stay published and runnable.
+#
+# The sub-index weights and metric mapping are identical to v2. One thing changed:
+#
+#   coverage.countSkipped: true. The confidence term counts sources that returned
+#   data against all registered sources, including ones skipped because their key
+#   is not configured (EDGAR without SEC_USER_AGENT, LegiScan without a key).
+#   Under v2 a skipped source dropped out of the denominator, so retiring GovTrack
+#   and skipping EDGAR raised confidence from 55% to 64% on 2026-10-15 with no new
+#   information. A missing key is missing data; confidence should not rise because
+#   a feed went quiet.
+#
+# Effect on 2026-10-16 inputs: readiness 28.1 and the projected date are unchanged;
+# coverage 100% -> 81.8%, confidence 64% -> 55%.
+#
+# Fork it and argue with us: copy to weights.v4.yaml, never edit this file.
+
+version: v3
+
+# Confidence counts skipped sources as missing. See the header.
+coverage:
+  countSkipped: true
+
+subIndices:
+  labor_dislocation:
+    weight: 0.30  # unemployment, payrolls trend, entry-level postings, AI-attributed layoffs
+    label: Labor dislocation
+    group: pressure
+  political_momentum:
+    weight: 0.20  # active bills, co-sponsors, committee movement, EOs
+    label: Political momentum
+    group: response
+  public_opinion:
+    weight: 0.15  # weighted mean of national polls
+    label: Public opinion
+    group: response
+  corporate_equity:
+    weight: 0.15  # equity pipeline (discounted proposals), AI capex vs headcount
+    label: Corporate equity
+    group: response
+  precedent:
+    weight: 0.15  # permanent programs, $ disbursed, recipients
+    label: Precedent
+    group: backdrop
+  fiscal_pressure:
+    weight: 0.05  # deficit, debt service. Kept, demoted: context, not cause.
+    label: Fiscal pressure
+    group: backdrop
+
+metrics:
+  labor.unemployment_rate: labor_dislocation
+  labor.payrolls_3mo_avg_change: labor_dislocation
+  labor.white_collar_openings_yoy: labor_dislocation
+  labor.ai_layoffs_ttm: labor_dislocation
+
+  politics.bills_with_committee_movement: political_momentum
+  politics.cosponsors_total: political_momentum
+  politics.ai_executive_actions_12mo: political_momentum
+
+  opinion.ubi_support_pct: public_opinion
+
+  corporate.equity_pipeline_usd: corporate_equity
+  corporate.capex_headcount_gap_pp: corporate_equity
+
+  precedent.permanent_programs: precedent
+  precedent.cash_disbursed_usd: precedent
+  precedent.recipients: precedent
+
+  fiscal.deficit_pct_gdp: fiscal_pressure
+  fiscal.interest_pct_receipts: fiscal_pressure
+
+  # Unscored
+  labor.ai_layoffs_ytd: null              # display only; ttm is the scored figure
+  corporate.equity_commitments_usd: null   # binding only; folded into the pipeline at weight 1.0
+  markets.passage_probability: null
+  politics.govtrack_prognosis_max: null
+  politics.state_bills_active: null

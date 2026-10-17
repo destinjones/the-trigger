@@ -4,7 +4,7 @@ Open-source tracker of US readiness for an AI-funded citizen dividend. Read READ
 
 ## Commands
 - `pnpm test` (vitest), `pnpm typecheck`, `pnpm lint`, `pnpm build` (Astro, static, root `web/`)
-- `pnpm snapshot [-- --date D --replay FILE --record FILE --revise --dry-run --weights v2]`
+- `pnpm snapshot [-- --date D --replay FILE --record FILE --revise --dry-run --weights vN]` (default: newest weights file)
 - `pnpm scorecard` regenerates SCOREBOARD.md from predictions/ledger.json
 - `pnpm health` lists failed/skipped sources and curated files near expiry; the snapshot job mirrors it into one `pipeline-health` issue
 - `pnpm typecheck` runs `tsc` and `astro check`; CI runs lint, typecheck, test, build, check-site on every PR

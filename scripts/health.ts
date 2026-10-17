@@ -13,7 +13,7 @@ import { parse } from 'yaml';
 import { checkHealth, renderHealth, type CuratedMeta, type HealthSnapshot } from './lib/health.ts';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
-const { values: args } = parseArgs({ options: { out: { type: 'string' } } });
+const { values: args } = parseArgs({ args: process.argv.slice(2).filter((a) => a !== '--'), options: { out: { type: 'string' } } });
 
 const iso = (d: unknown) => (d instanceof Date ? d.toISOString().slice(0, 10) : String(d).slice(0, 10));
 const newest = readdirSync(join(ROOT, 'data')).filter((f) => /^\d{4}-\d{2}-\d{2}\.json$/.test(f)).sort().at(-1);
