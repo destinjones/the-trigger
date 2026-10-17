@@ -1,6 +1,6 @@
 {
   "date": "2026-10-17",
-  "revision": 0,
+  "revision": 1,
   "weightsVersion": "v3",
   "readiness": 28.1,
   "projectedDate": "2031-01-01",
@@ -128,7 +128,7 @@
     {
       "metricId": "markets.passage_probability",
       "label": "Market odds of tariff-funded household checks",
-      "value": 3.1,
+      "value": 2.95,
       "unit": "%",
       "asOf": "2026-10-17",
       "fetchedAt": "2026-10-17T00:00:00Z",
