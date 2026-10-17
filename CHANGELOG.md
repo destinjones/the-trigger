@@ -15,6 +15,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Ver
 - CHANGELOG.md, SECURITY.md, CODE_OF_CONDUCT.md, CITATION.cff, issue forms, a pull request template and Dependabot.
 
 ### Changed
+- `/log` is daily: one entry per snapshot against the day before, quiet days included and marked. RSS stays a weekly digest.
+- The Kalshi metric is labelled "Market odds of tariff-funded household checks", which is what that market asks. It was labelled as if it priced a federal dividend.
 - Fonts are self-hosted (IBM Plex, latin subset, weights 400 and 500). Pages make no third-party requests.
 - Label text uses `--mut` instead of `--dim`, which was 2.1:1 against the background. All text now meets WCAG AA contrast; `--dim` remains for rules, ticks and disabled controls.
 - Wide tables on `/method` and the tracker scroll inside their panel on phones instead of widening the page.

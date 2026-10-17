@@ -1,35 +1,40 @@
 ---
 import Base from '../layouts/Base.astro';
 import { fileUrl, snapshots } from '../lib/data.ts';
-import { weeklyLog } from '../lib/log.ts';
+import { dailyLog } from '../lib/log.ts';
 import { fmtDate } from '../lib/format.ts';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
-const entries = weeklyLog(snapshots);
+const entries = dailyLog(snapshots);
+const quietDays = entries.filter((e) => e.quiet).length;
 ---
-<Base title="What moved: The Trigger" description="A weekly changelog written from the daily snapshots: what moved the AI dividend readiness index, and what did not." page="log">
+<Base title="What moved: The Trigger" description="A daily changelog written from the snapshots: what moved the AI dividend readiness index, and what did not." page="log">
   <section class="headline">
-    <h1>What moved. <span>Week by week.</span></h1>
+    <h1>What moved. <span>Day by day.</span></h1>
     <p class="lede">
-      Written by code from the committed snapshots: each week's last snapshot against the week before. Nothing here is
-      hand-edited. Follow it by <a href={`${base}/rss.xml`}>RSS</a>.
+      Written by code from the committed snapshots: each day's snapshot against the one before. Nothing here is
+      hand-edited. {quietDays > 0 && <>On {quietDays} of {entries.length} days nothing moved, and those days are listed too. </>}
+      A weekly digest goes out by <a href={`${base}/rss.xml`}>RSS</a>.
     </p>
   </section>
-  {entries.length === 1 && (
-    <p class="small muted">The tracker started on {fmtDate(entries[0]?.date ?? '')}. The first week-over-week entry is written by the first snapshot of next week.</p>
-  )}
   {entries.map((e) => (
-    <section class="panel log-entry" id={e.week}>
+    <section class={`panel log-entry${e.quiet ? ' log-quiet' : ''}`} id={e.date}>
       <div class="panel-head">
-        <h2><a href={`#${e.week}`}>{e.week}</a> · {fmtDate(e.date)}{e.since ? ` vs ${fmtDate(e.since)}` : ''}</h2>
+        <h2><a href={`#${e.date}`}>{fmtDate(e.date)}</a>{e.since ? ` vs ${fmtDate(e.since)}` : ''}</h2>
         <a class="small" href={fileUrl(`data/${e.date}.json`)}>snapshot</a>
       </div>
-      <p class="log-summary">{e.summary}</p>
-      <ul class="log-changes">
-        {e.changes.map((c) => (
-          <li class={`log-${c.kind}`}>{c.text}{c.href && <> <a class="small" href={c.href} rel="noopener">source</a></>}</li>
-        ))}
-      </ul>
+      {e.quiet ? (
+        <p class="log-summary muted">No change. Readiness {snapshots.find((s) => s.date === e.date)?.readiness.toFixed(1)}; no input, source or bill moved.</p>
+      ) : (
+        <>
+          <p class="log-summary">{e.summary}</p>
+          <ul class="log-changes">
+            {e.changes.map((c) => (
+              <li class={`log-${c.kind}`}>{c.text}{c.href && <> <a class="small" href={c.href} rel="noopener">source</a></>}</li>
+            ))}
+          </ul>
+        </>
+      )}
     </section>
   ))}
 </Base>

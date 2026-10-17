@@ -60,7 +60,7 @@ export const kalshi: Source = {
     if (!best) return [];
     return [{
       metricId: 'markets.passage_probability',
-      label: 'Market odds of federal household checks',
+      label: 'Market odds of tariff-funded household checks',
       value: best.pct,
       unit: '%',
       asOf: ctx.today,

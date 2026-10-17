@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Snapshot } from '../../../scripts/lib/run.ts';
-import { diffSnapshots, isoWeek, weeklyLog } from './log.ts';
+import { dailyLog, diffSnapshots, isoWeek, weeklyLog } from './log.ts';
 
 const snap = (date: string, over: Partial<Snapshot> = {}): Snapshot => ({
   date, revision: 0, weightsVersion: 'v2', readiness: 28.1, projectedDate: '2031-01-01', bandMonths: 22, confidence: 0.55,
@@ -43,5 +43,17 @@ describe('what moved', () => {
     expect(log[0]?.since).toBe('2026-10-15');
     expect(log[0]?.summary).toBe('Readiness 28.4 → 28.6 (+0.2); 0 inputs moved.');
     expect(log[0]?.changes.some((c) => c.text.includes('still in committee'))).toBe(true);
+  });
+});
+
+describe('daily log', () => {
+  it('writes one entry per snapshot, newest first, and marks quiet days', () => {
+    const log = dailyLog([snap('2026-10-14'), snap('2026-10-15'), snap('2026-10-16', { readiness: 28.3, confidence: 0.6 })]);
+    expect(log.map((e) => e.date)).toEqual(['2026-10-16', '2026-10-15', '2026-10-14']);
+    expect(log[1]?.quiet).toBe(true);
+    expect(log[0]?.quiet).toBe(false);
+    expect(log[0]?.since).toBe('2026-10-15');
+    expect(log[0]?.changes.map((c) => c.text)).toEqual(['Readiness 28.1 → 28.3 (+0.2).', 'Confidence 55% → 60%.']);
+    expect(log[2]?.since).toBeNull();
   });
 });
