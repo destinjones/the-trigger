@@ -4,7 +4,7 @@
 Every projection The Trigger makes is logged here when it is made and graded when it resolves.
 A projection is logged whenever its window or confidence changes; daily restatements of the same projection are not counted twice.
 
-As of 2026-10-17: **5** predictions, **0** resolved, **0** hit, **0** missed. Brier score: n/a until something resolves.
+As of 2026-10-18: **5** predictions, **0** resolved, **0** hit, **0** missed. Brier score: n/a until something resolves.
 
 ## Open
 
