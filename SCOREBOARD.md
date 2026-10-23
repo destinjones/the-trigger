@@ -4,7 +4,7 @@
 Every projection The Trigger makes is logged here when it is made and graded when it resolves.
 A projection is logged whenever its window or confidence changes; daily restatements of the same projection are not counted twice.
 
-As of 2026-10-22: **6** predictions, **0** resolved, **0** hit, **0** missed. Brier score: n/a until something resolves.
+As of 2026-10-23: **7** predictions, **0** resolved, **0** hit, **0** missed. Brier score: n/a until something resolves.
 
 ## Open
 
@@ -16,6 +16,7 @@ As of 2026-10-22: **6** predictions, **0** resolved, **0** hit, **0** missed. Br
 | 2026-10-15 | First federal AI dividend payment lands between 2029-03-01 and 2032-11-01 (point estimate 2031-01-01, Q1 2031) | 64% | 2032-11-01 | open | projection |
 | 2026-10-17 | First federal AI dividend payment lands between 2029-03-01 and 2032-11-01 (point estimate 2031-01-01, Q1 2031) | 55% | 2032-11-01 | open | projection |
 | 2026-10-21 | First federal AI dividend payment lands between 2029-03-01 and 2032-11-01 (point estimate 2031-01-01, Q1 2031) | 50% | 2032-11-01 | open | projection |
+| 2026-10-23 | First federal AI dividend payment lands between 2029-03-10 and 2032-11-10 (point estimate 2031-01-10, Q1 2031) | 55% | 2032-11-10 | open | projection |
 
 ## Resolved
 
