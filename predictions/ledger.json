@@ -155,6 +155,24 @@
       },
       "snapshot": "data/2026-10-25.json",
       "revision": 0
+    },
+    {
+      "id": "p-2026-10-29-projection",
+      "madeOn": "2026-10-29",
+      "claim": "First federal AI dividend payment lands between 2029-03-18 and 2032-09-18 (point estimate 2030-12-18, Q4 2030)",
+      "resolvesBy": "2032-09-18",
+      "confidence": 0.55,
+      "status": "open",
+      "resolvedOn": null,
+      "evidenceUrl": null,
+      "weightsVersion": "v3",
+      "kind": "projection",
+      "window": {
+        "from": "2029-03-18",
+        "to": "2032-09-18"
+      },
+      "snapshot": "data/2026-10-29.json",
+      "revision": 0
     }
   ]
 }
