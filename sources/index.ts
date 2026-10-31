@@ -11,6 +11,7 @@ import { edgar } from './edgar.ts';
 import { corporate } from './corporate.ts';
 import { challenger } from './challenger.ts';
 import { kalshi } from './kalshi.ts';
+import { polymarket } from './polymarket.ts';
 
 // Retired 2026-10-15: govtrack (sources/govtrack.ts). Its API answered 502 on
 // every request from the first snapshot on, it fed one unscored metric that never
@@ -22,5 +23,5 @@ export const SOURCES: Source[] = [
   // Tier 2
   pilots, polling, legiscan, edgar, corporate,
   // Tier 3
-  challenger, kalshi,
+  challenger, kalshi, polymarket,
 ];

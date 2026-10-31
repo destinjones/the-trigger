@@ -18,6 +18,7 @@ are released under CC0.
 | SEC EDGAR | Capex (XBRL company concepts), headcount (10-K text) | No key; `SEC_USER_AGENT` with contact info required by SEC | Public domain. SEC fair-access policy: identify yourself in the User-Agent, stay under 10 requests/second. |
 | LegiScan | State bills mentioning guaranteed or basic income | `LEGISCAN_API_KEY` (free tier) | LegiScan API terms; CC BY 4.0 for bulk data. Attribute LegiScan. |
 | Kalshi | Market price on federal household checks (unscored) | No key, public market data | Kalshi terms of service. Prices are recorded for calibration, not redistributed as a feed. |
+| Polymarket (gamma-api.polymarket.com) | Market price on a federal cash dividend (unscored) | No key, public gamma API | Polymarket terms of service. Prices are recorded for calibration, not redistributed as a feed. |
 | Challenger, Gray & Christmas | Job cuts attributed to AI (curated) | Monthly public reports; no API | Figures are facts reported in public press releases, cited by deep link. Our trailing-12-month figure is our own arithmetic. |
 | Guaranteed Income Pilots Dashboard (guaranteedincome.us) and program records | Pilot and permanent program counts, cash disbursed, recipients (curated) | Public pages; no API | Cited by deep link. Totals marked unverified where the publisher does not state them. |
 | National polls (Manhattan Institute, Data for Progress, AP-NORC) | Support for a basic income, weighted average (curated) | Public releases and toplines | Cited by deep link with sponsor, sample, field dates and question wording. |
