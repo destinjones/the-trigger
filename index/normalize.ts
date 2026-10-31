@@ -169,6 +169,10 @@ export const TRANSFORMS: Readonly<Record<string, Transform>> = {
     kind: 'linear', at0: 0, at100: 100, unit: '%',
     note: 'Unscored. Prediction-market probability of a federal UBI/dividend, for calibration only.',
   },
+  'markets.polymarket_probability': {
+    kind: 'linear', at0: 0, at100: 100, unit: '%',
+    note: 'Unscored. Polymarket probability of a federal cash dividend/rebate, for calibration only.',
+  },
   'politics.govtrack_prognosis_max': {
     kind: 'linear', at0: 0, at100: 100, unit: '%',
     note: 'Unscored. Highest GovTrack enactment prognosis among tracked bills.',

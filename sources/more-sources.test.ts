@@ -7,6 +7,10 @@ import {
   COMPANIES, annualFacts, annualReports, capexHeadcountGap, checkSecUserAgent, conceptUrl, docUrl, edgar, htmlToText, parseHeadcount, secHttp, submissionsUrl,
 } from './edgar.ts';
 import { kalshi, marketPct } from './kalshi.ts';
+import { apiUrl, polymarket, SLUGS, yesPct, type PMarket } from './polymarket.ts';
+import { normalize } from '../index/normalize.ts';
+import { parseWeights } from '../index/model.ts';
+import { readFileSync } from 'node:fs';
 import { pilots } from './pilots.ts';
 import { aggregatePolls, pollWeight, polling, type Poll } from './polling.ts';
 import { challenger } from './challenger.ts';
@@ -141,6 +145,49 @@ describe('kalshi (recorded)', () => {
     expect(marketPct({ ticker: 't', title: '', status: '', last_price_dollars: '0.12' })).toBeCloseTo(12, 6);
     expect(marketPct({ ticker: 't', title: '', status: '', yes_bid: 4, yes_ask: 6 })).toBe(5);
     expect(marketPct({ ticker: 't', title: '', status: '' })).toBeNull();
+  });
+});
+
+describe('polymarket', () => {
+  // Minimal real gamma-api response for the live $5,000-dividend market (shape
+  // recorded 2026-10-31 from https://gamma-api.polymarket.com/markets?slug=...).
+  const sample = [{
+    id: '4441736',
+    question: 'Will Trump create a $5,000 dividend by March 31, 2027?',
+    slug: 'will-trump-create-a-5000-dividend-by-march-31-2027',
+    outcomes: '["Yes","No"]',
+    outcomePrices: '["0.0565","0.9435"]',
+    lastTradePrice: 0.039,
+    active: true,
+    closed: false,
+  }];
+  it('reads the Yes price as a percentage, notes the question, deep-links the market', async () => {
+    const http = fakeHttp({ [`GET ${apiUrl(SLUGS[0] as string)}`]: JSON.stringify(sample) });
+    const r = await polymarket.fetch(ctx(http));
+    expect(r).toHaveLength(1);
+    expect(r[0]?.metricId).toBe('markets.polymarket_probability');
+    expect(r[0]?.value).toBe(5.65);
+    expect(r[0]?.unit).toBe('%');
+    expect(r[0]?.note).toBe('Will Trump create a $5,000 dividend by March 31, 2027?');
+    expect(r[0]?.sourceUrl).toBe('https://polymarket.com/event/will-trump-create-a-5000-dividend-by-march-31-2027');
+  });
+  it('yesPct prefers the Yes outcome price, falls back to last trade, skips closed/inactive', () => {
+    const m = (over: Partial<PMarket>): PMarket => ({ question: 'q', slug: 's', active: true, closed: false, ...over });
+    expect(yesPct(m({ outcomes: '["Yes","No"]', outcomePrices: '["0.12","0.88"]' }))).toBeCloseTo(12, 6);
+    expect(yesPct(m({ outcomes: '["Yes","No"]', outcomePrices: '["","1"]' }))).toBeNull();
+    expect(yesPct(m({ lastTradePrice: 0.12 }))).toBeCloseTo(12, 6);
+    expect(yesPct(m({ outcomes: '["Yes","No"]', outcomePrices: '["0.9","0.1"]', closed: true }))).toBeNull();
+    expect(yesPct(m({ active: false }))).toBeNull();
+    expect(yesPct(m({}))).toBeNull();
+  });
+  it('carries through normalize and maps to null (unscored) in weights v4', () => {
+    expect(normalize('markets.polymarket_probability', 5.65)).toBeCloseTo(5.65, 6);
+    const w4 = parseWeights(readFileSync(fileURLToPath(new URL('../index/weights.v4.yaml', import.meta.url)), 'utf8'));
+    expect(w4.version).toBe('v4');
+    expect(w4.metrics['markets.polymarket_probability']).toBeNull();
+    // v4 differs from v3 only by the new unscored mapping: readiness math is unchanged.
+    const w3 = parseWeights(readFileSync(fileURLToPath(new URL('../index/weights.v3.yaml', import.meta.url)), 'utf8'));
+    expect(w4.subIndices).toEqual(w3.subIndices);
   });
 });
 
