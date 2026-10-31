@@ -18,6 +18,7 @@ import type { SourceResult } from '../sources/_types.ts';
 const weightsText = readFileSync(fileURLToPath(new URL('./weights.v1.yaml', import.meta.url)), 'utf8');
 const W = parseWeights(weightsText);
 const W2 = parseWeights(readFileSync(fileURLToPath(new URL('./weights.v2.yaml', import.meta.url)), 'utf8'));
+const W4 = parseWeights(readFileSync(fileURLToPath(new URL('./weights.v4.yaml', import.meta.url)), 'utf8'));
 
 function m(metricId: string, value: number): SourceResult {
   return {
@@ -147,8 +148,11 @@ describe('weights', () => {
     expect(() => parseWeights('version: x\nsubIndices:\n  a: { weight: 1 }\nmetrics:\n  bogus.metric: a\n')).toThrow(/no transform/);
     expect(() => parseWeights('version: x\nsubIndices:\n  a: { weight: 1 }\nmetrics:\n  labor.unemployment_rate: b\n')).toThrow(/unknown sub-index/);
   });
-  it('every transform is mapped (scored or null) in the default weights, v2', () => {
-    for (const id of Object.keys(TRANSFORMS)) expect(id in W2.metrics, id).toBe(true);
+  // v1-v3 are published and frozen; the newest version is the one that must
+  // map every transform. New metrics land there as scored or null.
+  it('every transform is mapped (scored or null) in the newest weights, v4', () => {
+    for (const id of Object.keys(TRANSFORMS)) expect(id in W4.metrics, id).toBe(true);
+    expect(W4.metrics['markets.polymarket_probability']).toBeNull();
   });
   it('v2 demotes fiscal pressure and groups every sub-index', () => {
     expect(W2.version).toBe('v2');
