@@ -17,6 +17,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Ver
 - `astro check` in `pnpm typecheck`, so the site's TypeScript is checked in CI, not only the model and sources.
 - Lint rules that keep sources on `ctx.http` and `ctx.today`, and keep `new Date()` out of the model.
 - CHANGELOG.md, SECURITY.md, CODE_OF_CONDUCT.md, CITATION.cff, issue forms, a pull request template and Dependabot.
+- `schema/snapshot.schema.json` and `schemaVersion` (1) in each new snapshot. `/data` links the schema instead of the TypeScript types. Files written before this have no `schemaVersion` and are version 0, with the same fields.
+- `pnpm validate-data`: every file in `data/` against the schema rules (required keys, ISO dates, https links, sub-indices 0 to 100, no NaN). With `--against REF`, a changed file must bump its revision. `pnpm snapshot` runs the same checks before it writes.
+- `pnpm audit-chain`: each snapshot against the one before it. A stale value must equal the previous day's, and every metric of a failed source must be stale.
+- Tests for the snapshot runner: failure isolation, timeouts, skipped sources, carry-forward, validation and revision rules.
+
+### Fixed
+- The runner accepted `http://` source links (and `https://` with no host). It now requires an `https` link, as CLAUDE.md always said.
+- The snapshot job's commits were never checked before they were published: they use `GITHUB_TOKEN`, which triggers no workflow, so CI did not run on them. The job now runs lint, typecheck, `validate-data`, `audit-chain`, build and `check-site` before it commits. CI runs the data checks on every pull request, and a new `data` workflow covers hand-made pushes to `data/`.
 
 ### Changed
 - `/log` is daily: one entry per snapshot against the day before, quiet days included and marked. RSS stays a weekly digest.

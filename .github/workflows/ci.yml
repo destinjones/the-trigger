@@ -3,6 +3,8 @@ on:
   pull_request:
   push:
     branches: [main]
+    # data/ is checked by data.yml on push. The snapshot job's own commits use
+    # GITHUB_TOKEN and trigger neither; it runs the same checks before committing.
     paths-ignore: ['data/**']
 permissions:
   contents: read
@@ -16,6 +18,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # HEAD^1 is the base for the revision check.
+          fetch-depth: 2
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
@@ -25,5 +30,7 @@ jobs:
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm test
+      - run: pnpm validate-data -- --against HEAD^1
+      - run: pnpm audit-chain
       - run: pnpm build
       - run: pnpm check-site

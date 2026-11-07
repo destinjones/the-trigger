@@ -20,6 +20,8 @@
     "dev": "astro dev --root web",
     "build": "astro build --root web",
     "check-site": "tsx scripts/check-site.ts",
+    "validate-data": "tsx scripts/validate-data.ts",
+    "audit-chain": "tsx scripts/audit-chain.ts",
     "preview": "astro preview --root web"
   },
   "devDependencies": {

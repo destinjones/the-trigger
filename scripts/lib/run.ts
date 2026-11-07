@@ -8,7 +8,16 @@ import type {
 import { isRich } from '../../sources/_types.ts';
 import { buildSnapshot, type SnapshotCore, type Weights } from '../../index/model.ts';
 
+/**
+ * Version of the snapshot file format. Bump it when a field is added, renamed or
+ * removed, and describe the change in schema/snapshot.schema.json. Files written
+ * before the field existed have no schemaVersion and are read as version 0.
+ */
+export const SCHEMA_VERSION = 1;
+
 export interface Snapshot extends SnapshotCore {
+  /** Absent on files written before schema version 1. */
+  schemaVersion?: number;
   bills: BillRecord[];
   actors: ActorRecord[];
   filings: FilingRecord[];
@@ -31,6 +40,24 @@ export interface RunResult {
 
 const TIMEOUT_MS = 90_000;
 
+/**
+ * Revision to write for `date`, or an error when the write is not allowed.
+ * A past date that already has a file is immutable unless `revise` is set;
+ * today's file may be rescored and each rescore bumps the revision.
+ */
+export function nextRevision(
+  date: string,
+  today: string,
+  existing: { revision: number } | null,
+  revise: boolean,
+): { revision: number } | { error: string } {
+  if (!existing) return { revision: 0 };
+  if (date < today && !revise) {
+    return { error: `${date}.json already exists. Past snapshots are immutable; pass --revise to publish a correction.` };
+  }
+  return { revision: existing.revision + 1 };
+}
+
 function withTimeout<T>(p: Promise<T>, ms: number, id: string): Promise<T> {
   return new Promise((resolve, reject) => {
     const t = setTimeout(() => reject(new Error(`${id}: timed out after ${ms}ms`)), ms);
@@ -40,7 +67,9 @@ function withTimeout<T>(p: Promise<T>, ms: number, id: string): Promise<T> {
 
 function validate(r: SourceResult, id: string): void {
   if (!r.metricId || !Number.isFinite(r.value)) throw new Error(`${id}: invalid value for ${r.metricId}`);
-  if (!/^https?:\/\//.test(r.sourceUrl)) throw new Error(`${id}: ${r.metricId} has no deep link`);
+  if (typeof r.sourceUrl !== 'string' || !/^https:\/\/\S+$/.test(r.sourceUrl)) {
+    throw new Error(`${id}: ${r.metricId} has no https deep link`);
+  }
   if (!/^\d{4}-\d{2}-\d{2}/.test(r.asOf)) throw new Error(`${id}: ${r.metricId} has a bad asOf`);
 }
 
@@ -54,6 +83,7 @@ export async function runSources(
   ctx: FetchContext,
   previous: Snapshot | null,
   log: (msg: string) => void = () => {},
+  timeoutMs: number = TIMEOUT_MS,
 ): Promise<RunResult> {
   const out: RunResult = { metrics: [], bills: [], actors: [], filings: [], ok: [], failed: [], skipped: [], errors: {} };
 
@@ -65,8 +95,8 @@ export async function runSources(
     }
     try {
       const res = isRich(s)
-        ? await withTimeout(s.fetchRich(ctx), TIMEOUT_MS, s.id)
-        : { metrics: await withTimeout(s.fetch(ctx), TIMEOUT_MS, s.id) };
+        ? await withTimeout(s.fetchRich(ctx), timeoutMs, s.id)
+        : { metrics: await withTimeout(s.fetch(ctx), timeoutMs, s.id) };
       res.metrics.forEach((m) => validate(m, s.id));
       out.metrics.push(...res.metrics.map((m) => ({ ...m, sourceId: s.id })));
       out.bills.push(...(res.bills ?? []));
@@ -103,6 +133,7 @@ export function assemble(date: string, revision: number, weights: Weights, run: 
     sourcesSkipped: run.skipped,
   });
   return {
+    schemaVersion: SCHEMA_VERSION,
     ...core,
     bills: [...run.bills].sort((a, b) => b.date.localeCompare(a.date)),
     actors: run.actors,

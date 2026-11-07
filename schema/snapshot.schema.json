@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/destinjones/the-trigger/blob/main/schema/snapshot.schema.json",
+  "title": "The Trigger daily snapshot",
+  "description": "One file per day in data/YYYY-MM-DD.json. Files without schemaVersion predate version 1 and have the same shape. A change to any field is a new schemaVersion, recorded in the changelog below.",
+  "$comment": "Changelog. v1 (2026-11): adds schemaVersion; no other change from the unversioned files written 2026-10-14 to 2026-11-06.",
+  "type": "object",
+  "required": [
+    "date", "revision", "weightsVersion", "readiness", "projectedDate", "confidence", "bandMonths",
+    "sourceCoveragePct", "weightCovered", "subIndices", "metrics", "sourcesOk", "sourcesFailed",
+    "bills", "actors", "filings", "sourceErrors", "sourcesSkipped"
+  ],
+  "properties": {
+    "schemaVersion": { "type": "integer", "minimum": 1, "description": "File format version. Absent means version 0, which has the same fields as version 1." },
+    "date": { "$ref": "#/$defs/isoDate", "description": "Snapshot date. Equals the file name." },
+    "revision": { "type": "integer", "minimum": 0, "description": "0 for the first write of a date; each correction or same-day rescore adds 1." },
+    "weightsVersion": { "type": "string", "pattern": "^v[0-9]+$", "description": "Names index/weights.<version>.yaml." },
+    "readiness": { "type": "number", "minimum": 0, "maximum": 100, "description": "Composite readiness, 0 to 100." },
+    "projectedDate": { "$ref": "#/$defs/isoDate", "description": "Projected trigger date." },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "bandMonths": { "type": "number", "minimum": 0, "description": "Half-width of the uncertainty band, in months." },
+    "sourceCoveragePct": { "type": "number", "minimum": 0, "maximum": 100, "description": "Share of sources that returned live data." },
+    "weightCovered": { "type": "number", "minimum": 0, "maximum": 1, "description": "Share of index weight fed by a value." },
+    "subIndices": {
+      "type": "object",
+      "additionalProperties": { "type": ["number", "null"], "minimum": 0, "maximum": 100 },
+      "description": "Sub-index scores, 0 to 100, or null when no metric fed it."
+    },
+    "metrics": { "type": "array", "items": { "$ref": "#/$defs/metric" } },
+    "sourcesOk": { "type": "array", "items": { "type": "string" } },
+    "sourcesFailed": { "type": "array", "items": { "type": "string" } },
+    "sourcesSkipped": { "type": "array", "items": { "type": "string" }, "description": "Not attempted because a required key was not configured." },
+    "sourceErrors": { "type": "object", "additionalProperties": { "type": "string" } },
+    "bills": { "type": "array", "items": { "$ref": "#/$defs/linked" } },
+    "actors": { "type": "array", "items": { "$ref": "#/$defs/linked" } },
+    "filings": { "type": "array", "items": { "$ref": "#/$defs/linked" } }
+  },
+  "$defs": {
+    "isoDate": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
+    "httpsUrl": { "type": "string", "pattern": "^https://\\S+$" },
+    "linked": {
+      "type": "object",
+      "required": ["sourceUrl"],
+      "properties": { "sourceUrl": { "$ref": "#/$defs/httpsUrl" } }
+    },
+    "metric": {
+      "type": "object",
+      "required": ["metricId", "value", "unit", "asOf", "fetchedAt", "sourceName", "sourceUrl"],
+      "properties": {
+        "metricId": { "type": "string", "minLength": 1, "description": "Stable key, unique within a snapshot." },
+        "value": { "type": "number", "description": "Raw value in upstream units." },
+        "unit": { "type": "string" },
+        "asOf": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}", "description": "Date of the underlying observation, not the fetch." },
+        "fetchedAt": { "type": "string" },
+        "sourceName": { "type": "string" },
+        "sourceUrl": { "$ref": "#/$defs/httpsUrl", "description": "Deep link to the record the value came from." },
+        "sourceId": { "type": "string" },
+        "stale": { "type": "boolean", "description": "True when the source failed and this is the previous snapshot's value carried forward." },
+        "label": { "type": "string" },
+        "note": { "type": "string" },
+        "revision": { "type": "number", "description": "Upstream revision counter, when the publisher revises." }
+      }
+    }
+  }
+}

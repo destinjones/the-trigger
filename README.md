@@ -19,7 +19,9 @@
 nvm use            # Node 22.12+
 corepack enable    # pnpm
 pnpm install
-pnpm test          # model, sources (against recorded upstream responses), scorecard
+pnpm test          # model, runner, sources (against recorded upstream responses), scorecard
+pnpm validate-data # every data/ file against schema/snapshot.schema.json
+pnpm audit-chain   # stale values match the day before
 pnpm snapshot      # pull every source, write data/YYYY-MM-DD.json
 pnpm scorecard     # log the projection, regenerate SCOREBOARD.md
 pnpm health        # failed or skipped sources, curated files about to expire
