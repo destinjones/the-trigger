@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
   "date": "2026-11-07",
-  "revision": 0,
+  "revision": 1,
   "weightsVersion": "v3",
   "readiness": 25.8,
   "projectedDate": "2031-03-09",
-  "confidence": 0.54,
+  "confidence": 0.49,
   "bandMonths": 22,
-  "sourceCoveragePct": 81.8,
+  "sourceCoveragePct": 72.7,
   "weightCovered": 1,
   "subIndices": {
     "labor_dislocation": 9.7,
@@ -129,7 +129,7 @@
     {
       "metricId": "markets.passage_probability",
       "label": "Market odds of tariff-funded household checks",
-      "value": 1.6,
+      "value": 1.65,
       "unit": "%",
       "asOf": "2026-11-07",
       "fetchedAt": "2026-11-07T00:00:00Z",
@@ -172,7 +172,8 @@
       "sourceName": "Congress.gov actions, 2 watched bills",
       "sourceUrl": "https://www.congress.gov/bill/119th-congress/house-bill/5830",
       "note": "0 of 2 watched bills past referral",
-      "sourceId": "congress"
+      "sourceId": "congress",
+      "stale": true
     },
     {
       "metricId": "politics.cosponsors_total",
@@ -184,7 +185,8 @@
       "sourceName": "Congress.gov bill records",
       "sourceUrl": "https://www.congress.gov/bill/119th-congress/house-bill/5830/cosponsors",
       "note": "H.R. 5830: 11, S. 4825: 0",
-      "sourceId": "congress"
+      "sourceId": "congress",
+      "stale": true
     },
     {
       "metricId": "precedent.cash_disbursed_usd",
@@ -226,7 +228,6 @@
   "sourcesOk": [
     "bls",
     "challenger",
-    "congress",
     "corporate",
     "federal-register",
     "fred",
@@ -234,7 +235,9 @@
     "pilots",
     "polling"
   ],
-  "sourcesFailed": [],
+  "sourcesFailed": [
+    "congress"
+  ],
   "bills": [
     {
       "id": "s4825-119",
@@ -332,7 +335,9 @@
     }
   ],
   "filings": [],
-  "sourceErrors": {},
+  "sourceErrors": {
+    "congress": "congress: timed out after 90000ms"
+  },
   "sourcesSkipped": [
     "edgar",
     "legiscan"
