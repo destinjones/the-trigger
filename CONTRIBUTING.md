@@ -11,7 +11,7 @@ coding agents, and it is the shortest accurate summary for people too).
 nvm use                 # Node 22.12+
 corepack enable         # pnpm 10
 pnpm install
-pnpm test && pnpm typecheck && pnpm lint
+pnpm test && pnpm typecheck && pnpm lint && pnpm validate-data && pnpm audit-chain
 pnpm snapshot -- --replay fixtures/cassettes/2026-10-14.json --dry-run   # offline, no keys
 pnpm dev                # site at http://localhost:4321
 ```

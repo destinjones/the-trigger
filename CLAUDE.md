@@ -7,16 +7,22 @@ Open-source tracker of US readiness for an AI-funded citizen dividend. Read READ
 - `pnpm snapshot [-- --date D --replay FILE --record FILE --revise --dry-run --weights vN]` (default: newest weights file)
 - `pnpm scorecard` regenerates SCOREBOARD.md from predictions/ledger.json
 - `pnpm health` lists failed/skipped sources and curated files near expiry; the snapshot job mirrors it into one `pipeline-health` issue
-- `pnpm typecheck` runs `tsc` and `astro check`; CI runs lint, typecheck, test, build, check-site on every PR
+- `pnpm validate-data [-- --against REF]` checks every file in `data/` against `schema/snapshot.schema.json` rules; with `--against`, a changed file must bump `revision`, a new one starts at 0, and none may be deleted
+- `pnpm audit-chain` checks each snapshot against its predecessor: stale values equal yesterday's, a failed source's metrics are all stale
+- `pnpm typecheck` runs `tsc` and `astro check`; CI runs lint, typecheck, test, validate-data, audit-chain, build, check-site on every PR
+
+## Workflow triggers
+The snapshot job commits with `GITHUB_TOKEN`, and GitHub never starts a push workflow from a `GITHUB_TOKEN` push. So `ci.yml` and `data.yml` never see the daily commits, and `deploy.yml` hangs off `workflow_run` instead. Any check a new snapshot must pass runs inside `snapshot.yml` before it commits; add new checks there, not only in CI. Moving the bot to a PAT or app token would make its pushes start workflows; check every `on.push` filter (snapshot.yml rescores on pushes to `index/`, `sources/`, `scripts/lib/`) before doing it.
 
 ## Non-negotiables
 1. Git is the database. No backend, no runtime API calls in the browser. The site reads `data/*.json` at build time.
 2. Never rewrite a past snapshot. Corrections are a new revision (`--revise`), committed separately.
-3. Every rendered number carries a `SourceCite` deep link. A source result without an `https` `sourceUrl` is rejected by the runner.
+3. Every rendered number carries a `SourceCite` deep link. A source result without an `https` `sourceUrl` is rejected by the runner, and `validate-data` rejects any `sourceUrl` in a snapshot that is not `https`.
 4. Weights live only in `index/weights.v*.yaml`. Never hardcode weights in logic. Never edit a published weights version; add a new one.
 5. `index/` is pure: no I/O, no `Date.now()`, no randomness (lint enforces). Pass the date in.
 6. Predictions ledger is append-only. SCOREBOARD.md is generated; do not hand-edit.
 7. Tone: technical, flat, sentence case, no emoji, no hype.
+8. Snapshot format changes bump `SCHEMA_VERSION` in `scripts/lib/run.ts` and update `schema/snapshot.schema.json` (with its changelog) in the same commit. Old files are never migrated.
 
 ## Layout
 - `index/` model (normalize.ts transforms, model.ts composite + projection, weights YAML)

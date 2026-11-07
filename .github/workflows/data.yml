@@ -1,0 +1,31 @@
+name: data
+
+# A push to data/ on main that did not come from the snapshot job (a manual
+# revision, for example). ci.yml ignores data/ on push, and the snapshot job's
+# GITHUB_TOKEN commits trigger no workflow at all, so this is the check for
+# hand-made changes. Pull requests are covered by ci.yml.
+on:
+  push:
+    branches: [main]
+    paths: ['data/**']
+
+permissions:
+  contents: read
+
+jobs:
+  data:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm validate-data -- --against ${{ github.event.before }}
+      - run: pnpm audit-chain
+      - run: pnpm build
+      - run: pnpm check-site

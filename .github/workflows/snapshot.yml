@@ -42,6 +42,9 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      # A push to index/ or sources/ rescores today, so check that code as CI would.
+      - run: pnpm lint
+      - run: pnpm typecheck
       - run: pnpm test
 
       - name: Pull sources
@@ -57,6 +60,16 @@ jobs:
 
       - name: Resolve predictions and regenerate SCOREBOARD.md
         run: pnpm scorecard
+
+      # This job's commits use GITHUB_TOKEN, which never triggers a push workflow,
+      # so ci.yml does not run on them. Everything a new snapshot must pass is
+      # checked here, before the commit; a failure commits nothing.
+      - name: Check the new snapshot
+        run: |
+          pnpm validate-data -- --against HEAD
+          pnpm audit-chain
+          pnpm build
+          pnpm check-site
 
       - name: Commit
         run: |
