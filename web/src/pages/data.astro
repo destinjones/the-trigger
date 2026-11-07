@@ -51,8 +51,9 @@ const jsonLd = {
       </table>
     </div>
     <p>
-      Field definitions are the TypeScript types in <a href={fileUrl('sources/_types.ts')}>sources/_types.ts</a> and
-      <a href={fileUrl('scripts/lib/run.ts')}>scripts/lib/run.ts</a>. The endpoints update when the site deploys after each daily snapshot.
+      Field definitions are the JSON Schema in <a href={fileUrl('schema/snapshot.schema.json')}>schema/snapshot.schema.json</a>.
+      Each file carries a <code>schemaVersion</code>; files written before 2026-11-07 have none and are version 0, which has the same fields.
+      Every file in <code>data/</code> is checked against the schema rules before it is committed. The endpoints update when the site deploys after each daily snapshot.
     </p>
     <p>Embed the badge:</p>
     <pre tabindex="0"><code>{`<a href="${site}${base}/"><img src="${site}${base}/badge.svg" alt="AI dividend readiness"></a>`}</code></pre>

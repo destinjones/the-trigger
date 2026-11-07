@@ -18,7 +18,9 @@ import { parseArgs } from 'node:util';
 import { parseWeights } from '../index/model.ts';
 import { liveHttp, recordingHttp, replayHttp } from '../sources/_http.ts';
 import { SOURCES } from '../sources/index.ts';
-import { assemble, runSources, type Snapshot } from './lib/run.ts';
+import { assemble, nextRevision, runSources, SCHEMA_VERSION, type Snapshot } from './lib/run.ts';
+import { weightsVersions } from './lib/files.ts';
+import { validateSnapshot } from './lib/validate.ts';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const DATA = join(ROOT, 'data');
@@ -66,9 +68,8 @@ async function main(): Promise<void> {
   const target = `${date}.json`;
   const existing = files.includes(target) ? readSnapshot(target) : null;
   const today = new Date().toISOString().slice(0, 10);
-  if (existing && date < today && !args.revise) {
-    throw new Error(`${target} already exists. Past snapshots are immutable; pass --revise to publish a correction.`);
-  }
+  const planned = nextRevision(date, today, existing, args.revise);
+  if ('error' in planned) throw new Error(planned.error);
   const prevFile = files.filter((f) => f < target).at(-1);
   const previous = existing ?? (prevFile ? readSnapshot(prevFile) : null);
 
@@ -80,12 +81,22 @@ async function main(): Promise<void> {
   console.log(`snapshot ${date}  weights ${weights.version}  ${args.replay ? `replay ${args.replay}` : 'live'}`);
   const run = await runSources(SOURCES, { since, today: date, http, env: process.env }, previous, (m) => console.log('  ' + m));
 
-  const snap = assemble(date, existing ? existing.revision + 1 : 0, weights, run);
+  const snap = assemble(date, planned.revision, weights, run);
   const json = JSON.stringify(snap, null, 2) + '\n';
+  // Validate what will actually be written (after JSON round-tripping), and the
+  // in-memory snapshot too, since JSON.stringify silently turns NaN into null.
+  const invalid = [
+    ...validateSnapshot(snap, { fileDate: date, weightsVersions: weightsVersions(), schemaVersion: SCHEMA_VERSION }),
+    ...validateSnapshot(JSON.parse(json), { fileDate: date, weightsVersions: weightsVersions(), schemaVersion: SCHEMA_VERSION }),
+  ];
 
   console.log(`\nreadiness ${snap.readiness}  projected ${snap.projectedDate} ±${snap.bandMonths}mo  confidence ${Math.round(snap.confidence * 100)}%`);
   console.log(`coverage ${snap.sourceCoveragePct}% of sources, ${Math.round(snap.weightCovered * 100)}% of index weight`);
   for (const [k, v] of Object.entries(snap.subIndices)) console.log(`  ${k.padEnd(20)} ${v === null ? '—' : v}`);
+
+  if (invalid.length) {
+    throw new Error(`refusing to write data/${target}: ${[...new Set(invalid)].join('; ')}`);
+  }
 
   if (args['dry-run']) return;
   writeFileSync(join(DATA, target), json);
